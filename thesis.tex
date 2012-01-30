@@ -1,0 +1,61 @@
+\documentclass[twoside,openright,a4paper]{memoir}
+\usepackage[utf8]{inputenc}
+\usepackage[OT4]{fontenc}
+
+\begin{document}
+\title{MODELLING SYSTEM OF KARST CAVES FOR COMPUTER GRAPHICS}
+\author{Miłosz Kosobucki}
+
+\maketitle
+\newpage
+
+\begin{center}
+  \LARGE{Oświadczenie}
+\end{center}
+
+Ja, niżej podpisany \textbf{Miłosz Kosobucki} student Wydziału
+Matematyki i Informatyki Uniwersytetu im. Adama Mickiewicza w Poznaniu
+oświadczam, że przedkładaną pracę dyplomową pt.:
+
+\textbf{Modelling system of karst caves for computer graphics}
+
+napisałem samodzielnie. Oznacza to, że przy pisaniu pracy, poza niezbędnymi
+konsultacjami, nie korzystałem z pomocy innych osób, a w szczególności nie
+zlecałem opracowania rozprawy lub jej części innym osobom, ani nie
+odpisywałem tej rozprawy lub jej części od innych osób.
+
+Oświadczam również, że egzemplarz pracy dyplomowej w formie wydruku
+komputerowego jest zgodny z egzemplarzem pracy dyplomowej w formie
+elektronicznej.
+
+Jednocześnie przyjmuję do wiadomości, że gdyby powyższe oświadczenie
+okazało się nieprawdziwe, decyzja o wydaniu mi dyplomu zostanie cofnięta.
+
+\newcommand{\kropki}[2]{%
+  \vbox{%
+    \hbox to #1{\dotfill}%
+    \vspace{4pt}%
+    \hbox to #1{\hss #2\hss}%
+  }
+}
+\vspace{1cm}
+\hbox to \textwidth{%
+  \hfil
+  \kropki{4cm}{data}%
+  \hfil\hfil
+  \kropki{4cm}{podpis}%
+  \hfil
+}% \hfil = \hskip 0pt plus 1fil
+% \hss = \hskip 0pt plus 1fil minus 1fil
+% \hfilneg = \hskip 0pt plus -1fil
+\newpage
+
+\copyright Copyright\\
+by\\
+Miłosz Kosobucki\\
+2012
+
+\tableofcontents
+
+\include{chapter01/chapter01}
+\end{document}
