@@ -1,6 +1,8 @@
 \documentclass[twoside,openright,a4paper]{memoir}
 \usepackage[utf8]{inputenc}
 \usepackage[OT4]{fontenc}
+\usepackage[backend=biber,citestyle=authoryear-comp]{biblatex}
+\addbibresource{bibliography.bib}
 
 \begin{document}
 \title{MODELLING SYSTEM OF KARST CAVES FOR COMPUTER GRAPHICS}
@@ -58,4 +60,6 @@ Miłosz Kosobucki\\
 \tableofcontents
 
 \include{introduction/introduction}
+
+\printbibliography
 \end{document}
