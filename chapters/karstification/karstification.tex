@@ -35,12 +35,12 @@ development of karts caves.
     geological formation that is capable of holding large amounts of water
     through porosity, and other empty spaces inside.
   \item[Recharge]
-    process of addition of water to the aquifer.
+    process of addition of water to an aquifer.
 \end{description}
 \subsection{Elements of karst landscape}
 
 \begin{figure}
-  \centerline{\includegraphics[width=1.2\textwidth]{chapters/karstification/karst_landscape.jpg}}
+  \centerline{\includegraphics[width=\textwidth]{chapters/karstification/karst_landscape.jpg}}
   \caption{Karst landscape showing various features of karst aquifers.
     Figure from book by \cite{marshak2006}}
   \label{fig:karstlandscape}
@@ -64,17 +64,17 @@ are:
 
 \section{Overview of the karstification process}
 
-Most important factor in karstification process is flow of solvent throught an
+The most important factor in karstification process is flow of solvent throught an
 underground aquifer. Since bedrock is subject to geological processes, a
 net (sometimes called a matrix) of fractures of varying diameter and shape is
-present in it. This solvemt, usually waterm flows through this kind of net
+present in it. This solvent, usually water, flows through this kind of net and
 reacts with rock in ways described later.
 
-Such karst aquifer may be surrounded on its sides by an aquitart, a substance
-that is impenetrable to the water.
+Such karst aquifer may be surrounded on its sides by an aquitard, a substance
+that is impenetrable to water.
 
 Water that enters the system may come from precipation, rivers or lakes. Inflow
-of the water may happen through diffuse infiltration or point infiltration.
+of water may happen through diffuse infiltration or point infiltration.
 Diffuse infiltration happens on larger areas, covered by small fractures whereas
 point infiltration requires a prominent fracture to be present in the aquifer
 that can take large amounts of water from a river or lake.
@@ -115,11 +115,11 @@ slow reaction:
 
 \begin{equation}
   \cee{H2O + CaCO3 <-> Ca^2 + CO3^2- + H2O}
-  \label{react:slowdiss}
+  \label{eq1}
 \end{equation}
 
-Unfortunately, given very weak soulibility of calcium carbonate in water (only
-about 0.0013~g/100~mL in 25\degree C according to \cite{aylward2008si}),
+Unfortunately, given very weak soulibility of calcium carbonate in water~
+\footnote{Only about 0.0013~g/100~mL in 25\degree C according to \cite{aylward2008si}},
 limestone dissolution would be extremely slow.
 
 However, as the rain passes throught the atmosphere, it's picking up carbon
@@ -128,25 +128,39 @@ carbonic acid are produced:
 
 \begin{equation}
   \cee{H2O + CO2 -> H^+ + HCO3^-}
+  \label{eq2}
 \end{equation}
 
 Above raction delivers a proton that bonds with carbonate detached during slow
-dissolution \ref{react:slowdiss}:
+dissolution \ref{eq1}:
 
 \begin{equation}
   \ce{CO3^2- + H^+ -> HCO3^-}
+  \label{eq3}
 \end{equation}
 
 Thanks to this, the ion activity product \ce{(CO3^2- )} \ce{(Ca^2+)} is below the
-solubility constant of calcite. Calcium bicarbonate (\ce{Ca(HCO3)2}) produced
+solubility constant of calcite. Calcium bicarbonate \footnote{\ce{Ca(HCO3)2}} produced
 during this process has orders of magnitude better soulibility in water
-(16.6~g/100~mL in 20\degree C according to \cite{aylward2008si}) what greatly
+\footnote{16.6~g/100~mL in 20\degree C according to \cite{aylward2008si}} what greatly
 enchances the rate of limestone dissolution.
+
+\Crefrange{eq1}{eq3} can be summed up with the following single
+equation:
+
+\begin{equation}
+  \ce{CaCO3 + H2O -> Ca^2+ + 2HCO3^- }
+  \label{eq4}
+\end{equation}
 
 \section{Formation of speleothems}
 
 Speleothems form in a process reverse to dissolution. When water rich in calcium
 bicarbonate leaves small fissures in the rock and enters big, hollow areas, its
-pressure lowers and causes \ce{CO2}-degassing that is the major factor in 
-precipation of calcium carbonate on the surfaces of caves. Water evaporation
-plays marginal role in speleothem formation, what was shown by \cite{holland1964cave}\todo{fix bibliography entry}.
+pressure lowers and causes \ce{CO2}-degassing that is the major factor in
+precipation of calcium carbonate on the surfaces of caves.
+
+Loss of carbon dioxide leads to supersaturation in the solution
+%Water evaporation
+%plays marginal role in speleothem formation, what was shown by \cite{holland1964cave}\todo{fix bibliography entry}.
+
