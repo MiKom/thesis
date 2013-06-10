@@ -1,4 +1,4 @@
-This is my master's thesis. It's subject is:
+This is my master's thesis. Its subject is:
 
 *Modelling system of karst caves for computer graphics*
 
