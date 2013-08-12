@@ -1,8 +1,17 @@
 \chapter{Isosurface extraction with Marching Cubes}
 
-\begin{tikzpicture}[z={(-0.5cm,-0.25cm)}, scale=2]
-\input{chapters/marchingcubes/cases.tikz}
-\end{tikzpicture}
+\begin{figure}
+  \centerline{
+    \begin{tikzpicture}[z={(-0.58cm,-0.28cm)}, scale=1.5]
+    \input{chapters/marchingcubes/cases.tex}
+    \end{tikzpicture}
+  }
+  \caption{
+    All cases in Marching cubes algorithm. Symmetries and
+    rotations were ommited for brevity
+  }
+  \label{fig:mccases}
+\end{figure}
 
 \section{Implementation on GPU with OpenCL}
 \subsection{Parallell prefix sum operation}
