@@ -1,16 +1,23 @@
 \documentclass[twoside,openright,a4paper,12pt]{memoir}
 \usepackage[utf8]{inputenc}
 \usepackage[OT4]{fontenc}
-\usepackage[pdfborder={0,0,0}, colorlinks=true, linkcolor=blue,urlcolor=blue, citecolor=blue]{hyperref}
 \usepackage[backend=biber,citestyle=authoryear-comp,hyperref=true]{biblatex}
 \usepackage{todonotes}
 \usepackage{graphicx}
 \usepackage{tikz}
 \usepackage{gensymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
 \usepackage[version=3,arrows=pgf]{mhchem}
+\usepackage[pdfborder={0,0,0}, colorlinks=true, linkcolor=blue,urlcolor=blue, citecolor=blue]{hyperref}
 \usepackage{cleveref}
+
 \addbibresource{bibliography.bib}
 \addbibresource{chapters/karstification/karstification.bib}
+\addbibresource{chapters/marchingcubes/marchingcubes.bib}
+
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}
 
 \begin{document}
 \title{MODELLING SYSTEM OF KARST CAVES FOR COMPUTER GRAPHICS}
