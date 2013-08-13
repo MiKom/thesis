@@ -69,7 +69,7 @@ algorithm that read volumetric medical data (essentially a density function) and
 produced triangle mesh representing isosurface.
 
 General Electric submitted a patent application for the algorithm on
-June~5,~1985, which was granted on December~1,~1987 \parencite{mcpatent}.
+June~5, 1985, which was granted on December~1, 1987 \parencite{mcpatent}.
 
 Partly due to existence of this patent, another algorithm for isosurface
 extraction called \emph{Marching Tetrahedra} was invented to give graphics
@@ -98,13 +98,59 @@ certain that the surface crosses the edge.
 For each cube, there are $2^8=256$ possible combinations of sings of the
 vertices. Combination of the cube is called an \emph{index} of this cube.
 
-When the index of the cube is known, pre-generated LUTs\footnote{Look-Up Tables} are consulted to determine how many polygons and in what configuration should be
+When the index of the cube is known, pre-generated LUTs\footnote{Look-Up Tables}
+are consulted to determine how many polygons and in what configuration should be
 emitted for this cube.
 
 Process is repeated for all cubes in the lattice emitted polygons are the output
 of the algorithm.
 
 \subsubsection{Cube indexing}
+
+Operation on a single cube begins with evaluating density function on each
+vertex of the cube.
+
+Index of the vertex is calculated through operation described below
+Figure~\ref{fig:mcnumbering}.
+
+\begin{figure}
+  \centerline{
+   \input{chapters/marchingcubes/numbering.tex}
+  }
+  \caption{
+    Numbering of vertices and edges in Marching Cubes. Cube index is
+    derived by concatenation of bits \texttt{index = v8|v7|v6|v5|v4|v3|v2|v1}
+    where each \texttt{vi} is logical result (0 or 1) of operation of comparing
+    density function value at \emph{i}-th vertex with threshold value
+    (\texttt{value(i) > threshold}).
+  }
+  \label{fig:mcnumbering}
+\end{figure}
+
+\subsubsection{Emitting polygons}
+
+When index of the cube is known, LUT is consulted that maps index to list of
+edges on which vertex in given cube must be emitted.
+\pagebreak
+\begin{lstlisting}[caption={Index to edge list LUT. Notice that for indices 0
+and 255 no geometry is emitted}]
+unsigned char mcTriangleTable[256][16] = {
+        {255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255},
+        {0, 8, 3, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255},
+        ...
+        {0, 3, 8, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255},
+        {255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255}
+};
+\end{lstlisting}
+
+For each edge on the list vertex is emitted between its two ends in place
+proportional to the linear interpolation of density function at the vertices.
+
+Each three vertices form a polygon. In the listing above, value 255 marks an end
+of the list for given index.
+
+Next, each polygon is saved in a list for later usage, or directly fed to
+rendering device.
 
 
 \begin{figure}
@@ -114,10 +160,10 @@ of the algorithm.
     \end{tikzpicture}
   }
   \caption{
-    All cases in Marching cubes algorithm. Vertices with density function above
-    threshold value have black circles on them. Symmetries, rotations, and
-    complementary cases (with exception of cases 0 and 255 were omitted for
-    brevity.
+    All cases in traditional Marching cubes algorithm. Vertices with density
+    function above threshold value have black circles on them. Symmetries,
+    rotations, and complementary cases (with exception of cases 0 and 255) were
+    omitted for brevity.
   }
   \label{fig:mccases}
 \end{figure}

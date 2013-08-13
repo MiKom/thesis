@@ -1,14 +1,17 @@
 \documentclass[twoside,openright,a4paper,12pt]{memoir}
 \usepackage[utf8]{inputenc}
 \usepackage[OT4]{fontenc}
+\usepackage{lmodern}
 \usepackage[backend=biber,citestyle=authoryear-comp,hyperref=true]{biblatex}
 \usepackage{todonotes}
 \usepackage{graphicx}
 \usepackage{tikz}
+\usetikzlibrary{decorations.pathmorphing,backgrounds,positioning,fit}
 \usepackage{gensymb}
 \usepackage{amsfonts}
 \usepackage{amsthm}
 \usepackage[version=3,arrows=pgf]{mhchem}
+\usepackage{listings}
 \usepackage[pdfborder={0,0,0}, colorlinks=true, linkcolor=blue,urlcolor=blue, citecolor=blue]{hyperref}
 \usepackage{cleveref}
 
@@ -18,6 +21,12 @@
 
 \theoremstyle{definition}
 \newtheorem{defn}{Definition}
+
+\lstset{
+  language=[ISO]C++,
+  breaklines=true,
+  basicstyle=\ttfamily
+}
 
 \begin{document}
 \title{MODELLING SYSTEM OF KARST CAVES FOR COMPUTER GRAPHICS}

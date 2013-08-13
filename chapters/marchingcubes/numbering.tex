@@ -1,0 +1,35 @@
+\begin{tikzpicture}[
+  z={(-0.42cm,-0.35cm)}, scale=2.5,
+  vert/.style={circle,draw=black,fill=black},
+  edge/.style={circle,draw=black,fill=white}
+]
+ 
+  \node at (0,0,0) [vert,label=below:v1] (v1) {};
+  \node at (1,0,0) [edge,label=below:e1] (e1) {};
+  \node at (2,0,0) [vert,label=below:v2] (v2) {};
+  \node at (2,1,0) [edge,label=right:e2] (e2) {};
+  \node at (2,2,0) [vert,label=south east:v3] (v3) {};
+  \node at (1,2,0) [edge,label=north east:e3] (e3) {};
+  \node at (0,2,0) [vert,label=north west:v4] (v4) {};
+  \node at (0,1,0) [edge,label=left:e4] (e4) {};
+  \node at (0,0,-2) [vert,label=north east:v5] (v5) {};
+  \node at (1,0,-2) [edge,label=north west:e5] (e5) {};
+  \node at (2,0,-2) [vert,label=right:v6] (v6) {};
+  \node at (2,1,-2) [edge,label=right:e6] (e6) {};
+  \node at (2,2,-2) [vert,label=north east:v7] (v7) {};
+  \node at (1,2,-2) [edge,label=above:e7] (e7) {};
+  \node at (0,2,-2) [vert,label=above:v8] (v8) {};
+  \node at (0,1,-2) [edge,label=right:e8] (e8) {};
+  \node at (0,0,-1) [edge,label=right:e9] (e9) {};
+  \node at (2,0,-1) [edge,label=south east:e10] (e10) {};
+  \node at (2,2,-1) [edge,label=left:e12] (e12) {};
+  \node at (0,2,-1) [edge,label=north west:e11] (e11) {};
+
+  \draw
+    (v1) -- (e1) -- (v2) -- (e2) -- (v3) -- (e3) -- (v4) -- (e4) -- (v1)
+    (v5) -- (e5) -- (v6) -- (e6) -- (v7) -- (e7) -- (v8) -- (e8) -- (v5)
+    (v1) -- (e9) -- (v5)
+    (v2) -- (e10) -- (v6)
+    (v4) -- (e11) -- (v8)
+    (v3) -- (e12) -- (v7);
+\end{tikzpicture}
