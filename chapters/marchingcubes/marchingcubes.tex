@@ -1,5 +1,112 @@
 \chapter{Isosurface extraction with Marching Cubes}
 
+This chapter will present a method of isosurface extraction that is later used
+in the programming project. First, basic definitions will be established and
+rationale for generating graphics with volumetric data will be discussed.
+Next, brief history and high level overview of Marching Cubes will be presented.
+Technical details will follow with description of implementation on highly
+parallel GPGPU systems with OpenCL.
+
+\section{Definitions}
+
+\begin{defn}[Density function]
+\label{def:density function}
+Scalar function
+$\mathbb{R}^3\rightarrow\mathbb{R}$ or $\mathbb{R}^2\rightarrow\mathbb{R}$
+that defines value of some magnitude in a continuous space. An example of such
+function in 3D space is temperature defined in each point in the space. Height
+on a flat map on the other hand is a density function in 2D space.
+\end{defn}
+
+\begin{defn}[Isosurface]
+Surface in three-dimensional space that consists of points that have certain
+value of \emph{density function}.
+\end{defn}
+
+\begin{defn}[Isovalue]
+Certain value of density function which will be considered the surface. Points
+in domain which density function value is below this value are considered to
+lie below the surface and points which density function value is above this
+value are considered to lie above the surface. Points which density function
+value equals isovalue are considered to lie exactly on the isosurface.
+\end{defn}
+
+\section{Rationale for isosurface rendering}
+
+There are many applications which yield data as a density function. Some of them
+are listed below:
+\begin{description}
+	\item[CT\footnotemark scan.]\footnotetext{Computer Tomography}
+		Result of such scan is a discrete lattice of points with certain
+		values on vertices
+	\item[Weather data]
+		Weather data, especially coming from weather models consists of
+		scalar values of various parameters (temperature, humidity, etc.)
+		on earth's surface
+	\item[Arbitrary mathematical function]
+		It's often desirable to visualise mathematical function with
+		multiple parameters on 2D and 3D plots. For example for
+		educational purposes.
+	\item[Procedural models]
+		Surfaces expressed by density function may be a source of
+		visually interesting models that could be hard to model by hand.
+\end{description}
+
+Interactive presentation of such data may be very helpful while working with
+these applications. Ability to rotate, zoom and scale such surfaces may be
+beneficial to understanding the data since human sight apparatus is naturally
+well equipped to process 3D objects and images.
+
+\section{Marching Cubes algorithm overview}
+\subsection{History \parencite{mchist}}
+Marching Cubes algorithm was invented in 1984 by William E. Lorensen and Harvey
+E. Cline. While being employed by General Electric they attended a seminar by
+GE's Medical Systems Business Group employee Carl Crawford. Mr Crawford
+described capabilities of the upcoming rendering engine called \emph{Graphicon},
+that rendered using polygons. He also challenged seminar attendees to find
+interesting usages for the device. Within a day Lorenson and Cline devised an
+algorithm that read volumetric medical data (essentially a density function) and
+produced triangle mesh representing isosurface.
+
+General Electric submitted a patent application for the algorithm on
+June~5,~1985, which was granted on December~1,~1987 \parencite{mcpatent}.
+
+Partly due to existence of this patent, another algorithm for isosurface
+extraction called \emph{Marching Tetrahedra} was invented to give graphics
+community method that is not encumbered by patents. \emph{Marching Tetrahedra}
+also solves some ambiguities that are present in \emph{Marching Cubes}.
+
+Patent on \emph{Marching Cubes} algorithm expired in 2005.
+
+\subsection{Algorithm description \parencite{Lorensen:1987:MCH:37402.37422}}
+
+Marching cubes algorithm divides space on which it operates into a discrete
+lattice of cubes. For each cube, density function value is retrieved for each
+vertex of the cube. Density function may be calculated from the position of the
+vertex on the fly if it's defined as a mathematical function, or it may be
+extracted from some external volumetric data source (e.g. result of CT scan).
+
+Next, for each edge of the cube it's determine whether value at given vertex is
+larger or smaller than requested isovalue. If the value on the vertex is smaller
+than the threshold isovalue, vertex is below the surface. Otherwise it's above
+it.
+
+Being above or below the surface will be called the \emph{sign} of the vertex.
+If vertices on the ends of given cube's edge are of different signes, than it's
+certain that the surface crosses the edge.
+
+For each cube, there are $2^8=256$ possible combinations of sings of the
+vertices. Combination of the cube is called an \emph{index} of this cube.
+
+When the index of the cube is known, pre-generated LUTs\footnote{Look-Up Tables} are consulted to determine how many polygons and in what configuration should be
+emitted for this cube.
+
+Process is repeated for all cubes in the lattice emitted polygons are the output
+of the algorithm.
+
+\subsubsection{Cube indexing}
+
+
 \begin{figure}
   \centerline{
     \begin{tikzpicture}[z={(-0.58cm,-0.28cm)}, scale=1.5]
@@ -7,11 +114,13 @@
     \end{tikzpicture}
   }
   \caption{
-    All cases in Marching cubes algorithm. Symmetries and
-    rotations were ommited for brevity
+    All cases in Marching cubes algorithm. Vertices with density function above
+    threshold value have black circles on them. Symmetries, rotations, and
+    complementary cases (with exception of cases 0 and 255 were omitted for
+    brevity.
   }
   \label{fig:mccases}
 \end{figure}
 
 \section{Implementation on GPU with OpenCL}
-\subsection{Parallell prefix sum operation}
+\subsection{Parallel prefix sum operation}
