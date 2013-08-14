@@ -28,7 +28,7 @@ Certain value of density function which will be considered the surface. Points
 in domain which density function value is below this value are considered to
 lie below the surface and points which density function value is above this
 value are considered to lie above the surface. Points which density function
-value equals isovalue are considered to lie exactly on the isosurface.
+value is equal to the isovalue are considered to lie exactly on the isosurface.
 \end{defn}
 
 \section{Rationale for isosurface rendering}
@@ -37,8 +37,8 @@ There are many applications which yield data as a density function. Some of them
 are listed below:
 \begin{description}
 	\item[CT\footnotemark scan.]\footnotetext{Computer Tomography}
-		Result of such scan is a discrete lattice of points with certain
-		values on vertices
+		Result of such scan is a set of 2D slices with each slice
+		consisting of array of scalar values \parencite{Lorensen:1987:MCH:37402.37422}.
 	\item[Weather data]
 		Weather data, especially coming from weather models consists of
 		scalar values of various parameters (temperature, humidity, etc.)
@@ -53,7 +53,7 @@ are listed below:
 \end{description}
 
 Interactive presentation of such data may be very helpful while working with
-these applications. Ability to rotate, zoom and scale such surfaces may be
+these applications. Ability to rotate, zoom and scale such surfaces is
 beneficial to understanding the data since human sight apparatus is naturally
 well equipped to process 3D objects and images.
 
@@ -71,10 +71,11 @@ produced triangle mesh representing isosurface.
 General Electric submitted a patent application for the algorithm on
 June~5, 1985, which was granted on December~1, 1987 \parencite{mcpatent}.
 
-Partly due to existence of this patent, another algorithm for isosurface
-extraction called \emph{Marching Tetrahedra} was invented to give graphics
-community method that is not encumbered by patents. \emph{Marching Tetrahedra}
-also solves some ambiguities that are present in \emph{Marching Cubes}.
+Partly due to existence of this patent, another algorithm called
+\emph{Marching Tetrahedra} was invented to give graphics community another
+method of isosurface extraction, that is not encumbered by patents.
+\emph{Marching Tetrahedra} also solves some ambiguities that are present in
+\emph{Marching Cubes}.
 
 Patent on \emph{Marching Cubes} algorithm expired in 2005.
 
@@ -82,15 +83,15 @@ Patent on \emph{Marching Cubes} algorithm expired in 2005.
 \label{sec:mcdesc}
 
 Marching cubes algorithm divides space on which it operates into a discrete
-lattice of cubes. For each cube, density function value is retrieved for each
-vertex of the cube. Density function may be calculated from the position of the
-vertex on the fly if it's defined as a mathematical function, or it may be
-extracted from some external volumetric data source (e.g. result of CT scan).
+lattice of cubes (interchangeably called \emph{voxels}). For each cube, density
+function value is retrieved for each vertex of the cube. Density function may be
+calculated from the position of the vertex on the fly if it's defined as a
+mathematical function, or it may be extracted from some external volumetric data
+source (e.g. result of CT scan).
 
-Next, for each edge of the cube it's determine whether value at given vertex is
-larger or smaller than requested isovalue. If the value on the vertex is smaller
-than the threshold isovalue, vertex is below the surface. Otherwise it's above
-it.
+Next, for each vertex of the cube it's determined whether value at its position
+is larger or smaller than requested isovalue. If the value on the vertex is
+smaller vertex is below the surface. Otherwise it's above it.
 
 Being above or below the surface will be called the \emph{sign} of the vertex.
 If vertices on the ends of given cube's edge are of different signes, than it's
@@ -108,8 +109,8 @@ combinations of vertices into 15 cases. These cases are presented in
 \autoref{fig:mccases}. Remaining combinations are derivatives of these cases
 (symmetries, rotations, and complimentary cases).
 
-Process is repeated for all cubes in the lattice emitted polygons are the output
-of the algorithm.
+Process is repeated for all cubes in the lattice and emitted polygons (possibly
+with normal vectors for lighting) are the output of the algorithm.
 
 \begin{figure}
   \centerline{
@@ -199,7 +200,9 @@ will not work.
 Kernel execution is divided into the following stages:
 \todo{insert image with stages diagram}
 
-All operations are performed on cube lattice flattened to 1D array.
+All operations are performed on cube lattice flattened to 1D array. Each stage
+of the execution will be described below.
+
 \subsubsection{Voxel classification}
 
 In this stage, all voxels are classified as to whether they will produce any
@@ -251,6 +254,19 @@ int getCubeIndex(float4 *cubeValues, float isoValue)
 \end{lstlisting}
 
 \subsubsection{Compacting}
+
+\begin{figure}
+	\begin{center}
+		\includegraphics[width=\textwidth]{chapters/marchingcubes/compact.jpg}
+	\end{center}
+	\caption{Example of compaction procedure. Index of each non empty voxel
+		is saved in \texttt{compactedVoxelArray}. Place to which index
+		should be stored is read from \texttt{voxelOccupiedScan} array.
+	}
+	\label{fig:mccompact}
+\end{figure}
+\todo{replace figure \ref{fig:mccompact} with proper graphics}
+
 To overcome problem highlighted in \autoref{sec:mcgpu} a special compacting
 operation is performed on arrays from previous step. First, a prefix-sum array
 is computed in parallel on the GPU \footnote{implementation based on \cite{gpugemsscan},
@@ -297,23 +313,11 @@ void compactVoxels(
 }
 \end{lstlisting}
 
-\begin{figure}
-	\begin{center}
-		\includegraphics[width=\textwidth]{chapters/marchingcubes/compact.jpg}
-	\end{center}
-	\caption{Example of compaction procedure. Index of each non empty voxel
-		is saved in \texttt{compactedVoxelArray}. Place to which index
-		should be stored is read from \texttt{voxelOccupiedScan} array.
-	}
-	\label{fig:mccompact}
-\end{figure}
-\todo{replace figure \ref{fig:mccompact} with proper graphics}
-
 Scan operation on \texttt{voxelVerts} array gives \texttt{generateTriangles}
 kernel offset to the result array where data for given voxel should be written.
 For an example refer to \autoref{fig:mcvertscan}.
 
-\begin{figure}
+\begin{figure}[b]
 	\begin{center}
 		\includegraphics[width=\textwidth]{chapters/marchingcubes/vertscan.jpg}
 	\end{center}
@@ -340,7 +344,10 @@ on them. However, using \texttt{if} statement in kernel in this context would
 cause divergence in execution of parallel threads.
 
 From now on, algorithm is the same as in sequential version. List of edges on
-which vertices lie is read from LUT mentioned in \autoref{sec:mcemitting}.
-Positions of vertices and normals on these edges are read from \texttt{vertList}
-and \texttt{normList} arrays, and are written into result vertex position and
-normal arrays on indices read from \texttt{voxelVertScan} array.
+which vertices lie is read from LUT mentioned in \autoref{sec:mcemitting}. This
+table is accessed as a 2D texture. Agressive caching strategy implemented in
+GPUs for texture data access allows the kernel to retrieve the data without
+much penalty. Positions of vertices and normals on edges read from LUT are read
+from \texttt{vertList} and \texttt{normList} arrays, and are written into result
+vertex position and normal arrays on indices read from \texttt{voxelVertsScan}
+array.
