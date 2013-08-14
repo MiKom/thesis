@@ -12,7 +12,7 @@
 \usepackage{amsthm}
 \usepackage[version=3,arrows=pgf]{mhchem}
 \usepackage{listings}
-\usepackage[pdfborder={0,0,0}, colorlinks=true, linkcolor=blue,urlcolor=blue, citecolor=blue]{hyperref}
+\usepackage[bookmarks,pdfborder={0,0,0}, colorlinks=true, linkcolor=blue,urlcolor=blue, citecolor=blue]{hyperref}
 \usepackage{cleveref}
 
 \addbibresource{bibliography.bib}
@@ -25,8 +25,27 @@
 \lstset{
   language=[ISO]C++,
   breaklines=true,
-  basicstyle=\ttfamily
+  basicstyle=\ttfamily\footnotesize,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  stepnumber=2
 }
+
+\lstdefinelanguage{opencl}[ISO]{C++} {
+  morekeywords={
+    float2,float3,float4,int2,int3,int4,uint,uin2,uint3,uint4,
+    image2d_t,
+    __kernel,__read_only,
+    async_work_group_copy, async_work_group_strided_copy, wait_group_events,prefetch,
+    clamp,degrees,max,min,mix,radians,sign,smoothstep,step,
+    mem_fence,read_mem_fence,write_mem_fence,
+    cross,dot,distance,length,normalize,fast_distance,fast_length,fast_normalize,
+    read_imagef,read_imagei, read_imageui,read_imageh,write_imageh,write_imagef,write_imagei,write_imageui,get_image_width,get_image_height,get_image_depth,get_image_channel_data_type,get_image_channel_order,get_image_dim,
+    abs,abs_diff,add_sat,hadd,rhadd,clz,clamp,mad_hi,mad24,mad_sat,mul_hi,mul24,rotate,sub_sat,upsample,
+  }
+}
+
+\setcounter{tocdepth}{3}
 
 \begin{document}
 \title{MODELLING SYSTEM OF KARST CAVES FOR COMPUTER GRAPHICS}
