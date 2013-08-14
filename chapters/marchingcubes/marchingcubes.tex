@@ -149,6 +149,7 @@ Index of the vertex is calculated through operation described below
 \end{figure}
 
 \subsubsection{Emitting polygons}
+\label{sec:mcemitting}
 
 When index of the cube is known, LUT is consulted that maps index to list of
 edges on which vertex in given cube must be emitted.
@@ -252,29 +253,94 @@ int getCubeIndex(float4 *cubeValues, float isoValue)
 \subsubsection{Compacting}
 To overcome problem highlighted in \autoref{sec:mcgpu} a special compacting
 operation is performed on arrays from previous step. First, a prefix-sum array
-is computed in parallel on the GPU on \texttt{voxelOccupied} array resulting
-int \texttt{voxelOccupiedScan} array.
+is computed in parallel on the GPU \footnote{implementation based on \cite{gpugemsscan},
+as included in \href{https://developer.nvidia.com/cuda-downloads}{NVIDIA CUDA SDK}}
+on \texttt{voxelOccupied} and \texttt{voxelVerts} arrays resulting in
+\texttt{voxelOccupiedScan} and \texttt{voxelVertsScan} arrays.
 
 \begin{defn}[Prefix-sum operation \parencite{BlellochTR90}]
 operation that takes binary associative operator $\oplus$ with identity $I$ and
 an array of $n$ elements $[a_0,a_1,\ldots,a_{n-1}]$ and returns the array
 $[I,a_0,(a_0\oplus a_1),\ldots,(a_0\oplus a_1 \oplus \ldots \oplus a_{n-2})]$
+
+This operation is sometimes called \emph{scan} operation.
 \end{defn}
 
 By reading the last elements of \texttt{voxelOccupied} and
 \texttt{voxelOccupiedScan} and adding them, the number of voxels that will
-produce geometry can be obtained.
+produce geometry can be obtained. These voxels are called \emph{active voxels}.
 
-\todo{replace figure \ref{fig:mccompact} with proper graphics}
+Thanks to voxel compaction, the most computation--intensive kernel, i.e.
+\texttt{generateTriangles} kernel that generates final geometry can be computed
+only for voxels that are not empty. Since in many cases, space on which Marching
+cube is working is rather sparse, this approach can bring enormous performance
+gains.
+
+Let call the number of active voxels $n$. Compaction kernel creates an array
+of length $n$ that will contain indexes of non empty voxels. For illustration of
+this process refer to \autoref{fig:mccompact}.
+
+Below is the code that performs the compaction.
+\begin{lstlisting}[language=opencl]
+__kernel
+void compactVoxels(
+	__global uint *compactedVoxelArray,
+	__global uint *voxelOccupied,
+	__global uint *voxelOccupiedScan,
+	uint numVoxels
+)
+{
+	uint i = get_global_id(0);
+	if(voxelOccupied[i] && (i < numVoxels)) {
+		compactedVoxelArray[voxelOccupiedScan[i]] = i;
+	}
+}
+\end{lstlisting}
 
 \begin{figure}
 	\begin{center}
 		\includegraphics[width=\textwidth]{chapters/marchingcubes/compact.jpg}
 	\end{center}
-	\caption{Scan operation on \texttt{voxelVerts} array gives indexes to
-		final result array for every active voxel.
+	\caption{Example of compaction procedure. Index of each non empty voxel
+		is saved in \texttt{compactedVoxelArray}. Place to which index
+		should be stored is read from \texttt{voxelOccupiedScan} array.
 	}
 	\label{fig:mccompact}
 \end{figure}
+\todo{replace figure \ref{fig:mccompact} with proper graphics}
 
-\subsection{Parallel prefix sum operation}
+Scan operation on \texttt{voxelVerts} array gives \texttt{generateTriangles}
+kernel offset to the result array where data for given voxel should be written.
+For an example refer to \autoref{fig:mcvertscan}.
+
+\begin{figure}
+	\begin{center}
+		\includegraphics[width=\textwidth]{chapters/marchingcubes/vertscan.jpg}
+	\end{center}
+	\caption{Scan operation on \texttt{voxelVerts} array gives indexes to
+		final result array for every active voxel.
+	}
+	\label{fig:mcvertscan}
+\end{figure}
+
+\subsubsection{Generating trangles}
+
+Triangle generation is handled by \texttt{generateTriangles} kernel. It figures
+out the number of voxel it's working on from \texttt{compactedVoxelArray}. Next,
+array in local memory is allocated for computing locations of vertices on each
+of the 12 edges on the cube.
+
+\begin{lstlisting}
+__local float4 vertList[12*NTHREADS];
+__local float4 normList[12*NTHREADS];
+\end{lstlisting}
+
+Positions are calculated even though certain edges may not have surface border
+on them. However, using \texttt{if} statement in kernel in this context would
+cause divergence in execution of parallel threads.
+
+From now on, algorithm is the same as in sequential version. List of edges on
+which vertices lie is read from LUT mentioned in \autoref{sec:mcemitting}.
+Positions of vertices and normals on these edges are read from \texttt{vertList}
+and \texttt{normList} arrays, and are written into result vertex position and
+normal arrays on indices read from \texttt{voxelVertScan} array.
