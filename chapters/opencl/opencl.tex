@@ -1,4 +1,93 @@
 \chapter{OpenCL heterogenous programming platform}
+This chapter will describe OpenCL. A framework for writing applications that
+harness computational capabilities of heterogeneous hardware environment on
+which applications are run. Since the introduction of programmable pipeline
+in GPUs\footnote{Graphics Processing Unit} an opportunity appeared to use
+capabilities of these devices to offload highly parallel, computationally
+intensive tasks from main CPU\footnote{Central Processing Unit}. OpenCL can also
+expose dedicated hardware units designed to perform certain specialized tasks
+like Digital Signal Processing.
+
+OpenCL is used in programming project described in \autoref{chap:project}.
+Metaballs and Marching Cubes algorithm are implemented with it. Marching Cubes
+algorithm and its OpenCL implementation are described in detail in
+\autoref{chap:marchingcubes}.
+\section{Introduction}
+This section is based on \cite{Kirk:2010:PMP:1841511} and
+\cite{gaster2012heterogeneous}.
+
+\subsection{Beginnings of programmable GPUs}
+
+From early 1980s to late 1990s most graphic hardware was fixed--function.
+I.e. dedicated graphics units exposed fixed set of functions that were
+implemented in hardware or drivers. It wasn't possible to write custom program
+that would be executed on the GPU.
+
+As the complexity of fixed--function APIs expanded, hardware vendors implemented
+them with general purpose processors that could run some limited instruction set
+on many processors. This instruction set was used to implement graphics APIs
+like OpenGL or DirectX.
+
+In 2001 NVIDIA released GeForce 3 graphics card that exposed this internal
+instruction set to users of OpenGL and DirectX APIs. ATI technologies followed
+with Radeon 9700 that could also run programs supplied by the user on the GPU.
+DirectX 8 and OpenGL introduced programmable vertex stage. With
+DirectX 9 another programmable stage was introduced, the pixel (or fragment in
+OpenGL terminology) shader. At this point, vertex and pixel shaders were
+implemented via separate chips in the GPU. In 2005, with release of XBox 360
+first unified architecture was introduced, on which vertex and fragment shaders
+were run on the same processor.
+
+Graphics processing, that these devices were build for is very well suited for
+parallelization. Vertex shader stage takes list of vertices as its input and
+maps them onto the screen optionally defining colour of the vertex. Each
+vertex is processed independently making it possible to process many vertices
+at the same time.
+
+Pixel shader stage receives position of the point and returns final colour of
+the pixel. This also is done independently for each pixel.
+
+\subsubsection[Early attempts at GPGPU]{Early attempts at GPGPU\footnote{General Purpose GPU}}
+
+With the unification of computational resources in the GPUs they started to
+resemble highly parallel computers. Researchers noted this fact, and tried to
+harness enormous parallel performance for workloads other than graphics.
+
+GPUs of DirectX 9 era were still designed in graphics processing in mind.
+Although there were programmable stages in the pipeline, types of input and
+output parameters in each stage were severely limited. Moreover, the final
+result was generated as a pixel buffer, so the programmer had to map outputs of
+his algorithm to 2D screen space with pixel colour as output. Inputs to the
+pixel shader stage had to be supplied by textures.
+
+Even with these issues, researchers who managed to port their algorithms to
+GPUs reported great performance benefits.
+
+\subsubsection{CUDA}
+
+When working on Tesla GPU architecture, engineers at NVIDIA realized the
+potential in providing device's resources in easier way. Additional instructions
+and functionalities were added to the device. Among them, read and write
+operation with arbitrary offsets\footnote{Shaders could only write to predestined
+places in memory, reserved for pixel output}, synchronization barriers for
+groups of threads, atomic read/write operations. New parallel programming model
+was developed that defined hierarchy of threads.
+
+To expose all these features to programmers new C--like language was
+created and named CUDA\footnote{Compute Unified Device Architecture}.
+
+CUDA is capable of operating without any DirectX or OpenGL context. Device it's
+run on doesn't even have to be connected to any display output. CUDA programs
+are usually inlined in larger C or C++ programs and are called \emph{kernels}.
+Special compiler called \emph{nvcc} is used to compile kernel code. For more
+information about CUDA refer to official \href{http://www.nvidia.com/object/cuda_home_new.html}{CUDA website}.
+
+\subsubsection{Inception of OpenCL}
+
+On June 16th, 2008 Khronos Group announced formation of Compute Working Group
+that was tasked with establishing open standard for programming heterogeneous
+CPU and GPU environments\footnote{\url{https://www.khronos.org/news/press/khronos\_launches\_heterogeneous\_computing\_initiative}}.
+
 \section{High-level architecture}
 \section{Logical abstraction of computational resources}
 \section{Execution model}
