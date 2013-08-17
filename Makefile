@@ -2,7 +2,7 @@
 MAINDOC := thesis
 
 TEXSRC := $(foreach dir, $(wildcard ./chapters/*), $(wildcard $(dir)/*.tex))
-BIBSRC := $(wildcard ./*.bib)
+BIBSRC := $(foreach dir, $(wildcard ./chapters/*), $(wildcard $(dir)/*.bib))
 
 $(MAINDOC).pdf: bibliography $(TEXSRC)
 	pdflatex $(MAINDOC).tex
