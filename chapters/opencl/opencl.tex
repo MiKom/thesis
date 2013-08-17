@@ -80,15 +80,92 @@ CUDA is capable of operating without any DirectX or OpenGL context. Device it's
 run on doesn't even have to be connected to any display output. CUDA programs
 are usually inlined in larger C or C++ programs and are called \emph{kernels}.
 Special compiler called \emph{nvcc} is used to compile kernel code. For more
-information about CUDA refer to official \href{http://www.nvidia.com/object/cuda_home_new.html}{CUDA website}.
+information about CUDA refer to official CUDA website\footnote{\url{http://www.nvidia.com/object/cuda_home_new.html}}.
 
 \subsubsection{Inception of OpenCL}
 
-On June 16th, 2008 Khronos Group announced formation of Compute Working Group
+On June 16th, 2008 Khronos Group announced formation of Compute Working Group (CWG)
 that was tasked with establishing open standard for programming heterogeneous
 CPU and GPU environments\footnote{\url{https://www.khronos.org/news/press/khronos\_launches\_heterogeneous\_computing\_initiative}}.
+CWG consisted of many hardware and software vendors interested in
+standardization of such API.
 
-\section{High-level architecture}
+Compute Working Group adopted proposal of Apple Inc. that submitted programming
+interface called Open Compute Language (OpenCL). Apple was already developing
+OpenCL for quite some time to have it ready for its upcoming Mac OS X Snow
+Leopard release.
+
+On December 9th, 2008 final specification of OpenCL 1.0 was
+released\footnote{\url{https://www.khronos.org/news/press/the\_khronos\_group\_releases\_opencl\_1.0\_specification}}.
+Releases of conforming implementations from hardware vendors followed\footnote{http://www.khronos.org/conformance/adopters/conformant-products/\#opencl}.
+
+\subsection{Specification}
+OpenCL specification is maintained by the Khronos Group. It consists of C API
+and Kernel language that is similar to C99. Khronos releases official C++
+wrapper API\footnote{This wrapper API is used in programming project of this thesis}.
+
+Unofficial bindings for various languages and frameworks also exist. Among others
+\begin{itemize}
+	\item PyOpencl\footnote{\url{http://mathema.tician.de/software/pyopencl}}
+		for Python
+	\item JOCL\footnote{\url{http://www.jocl.org/}} for Java.
+	\item fortrancl\footnote{\url{http://code.google.com/p/fortrancl/}} for Fortran
+	\item gocl\footnote{\url{https://github.com/elima/gocl}} wrapper for C
+		applications based on GObject
+	\item QtOpenCL\footnote{\url{http://doc.qt.digia.com/opencl-snapshot/index.html}}
+		wrapper based on Qt library semantics.
+\end{itemize}
+
 \section{Logical abstraction of computational resources}
+
+OpenCL aims to be API that lets hardware manufacturers expose various kinds of
+devices to the programmers in a consistent and abstracted way. To fulfil this
+requirement OpenGL defines logical hierarchy of computational resources.
+Hardware vendors map real hardware to this abstraction in their implementations
+of OpenCL.
+
+OpenCL defines one processor (\emph{host})that is coordinating execution of
+OpenCL kernels on one or more \emph{devices}. Host, is executing functions from
+C API portion of the specification. It's responsible for discovering available
+devices, setting up contexts for them, allocating memory on host and devices,
+queuing execution of kernels and initiating transfer of data between various
+memories.
+
+Diagram of this logical structure is presented in \autoref{fig:clhw}.
+
+\begin{figure}[h]
+	\begin{center}
+		\includegraphics[scale=0.7]{chapters/opencl/opencl_hwmodel.jpg}
+	\end{center}
+	\caption{Logical partitioning of hardware in OpenCL}
+	\label{fig:clhw}
+\end{figure}
+
+\subsection{Platforms}
+
+On the top of the hierarchy is \emph{Platform}. It is usually an implementation
+of OpenCL by a single vendor. To query list of available platform in the system
+function \texttt{clGetPlatformIds()} must be called twice. Once with parameter
+\texttt{platforms} set to \texttt{NULL} to obtain number of platforms, and
+second time, with \texttt{platform} parameter set to array that will fit
+number of \texttt{cl\_platform\_id} structures equal or greater than the number
+retrieved on first invocation of this function.
+
+Note however, that OpenCL is usually loaded as a dynamic library provided by
+vendor. These libraries will usually return only one platform.
+
+To address this problem Khronos Group introduced \texttt{cl\_khr\_icd} extension
+that depending on operating system, will look for list of installed OpenCL
+ICDs or Installable Client Drivers in place specific for given OS. If
+implementation supports this extension, new function \texttt{clIcdGetPlatformIDsKHR}
+is available that will present to the user platforms from all vendors available
+on the system. This extension also makes sure, that function calls with OpenCL
+object created in certain platform will be routed to implementations in this
+platform.
+
+\subsection{Devices}
+
+
+
 \section{Execution model}
 \section{Memory access}
