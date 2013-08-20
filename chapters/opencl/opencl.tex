@@ -124,7 +124,7 @@ requirement OpenGL defines logical hierarchy of computational resources.
 Hardware vendors map real hardware to this abstraction in their implementations
 of OpenCL.
 
-OpenCL defines one processor (\emph{host})that is coordinating execution of
+OpenCL defines one processor (\emph{host}) that is coordinating execution of
 OpenCL kernels on one or more \emph{devices}. Host, is executing functions from
 C API portion of the specification. It's responsible for discovering available
 devices, setting up contexts for them, allocating memory on host and devices,
@@ -149,7 +149,8 @@ function \texttt{clGetPlatformIds()} must be called twice. Once with parameter
 \texttt{platforms} set to \texttt{NULL} to obtain number of platforms, and
 second time, with \texttt{platform} parameter set to array that will fit
 number of \texttt{cl\_platform\_id} structures equal or greater than the number
-retrieved on first invocation of this function.
+in argument \texttt{num\_platforms} retrieved on first invocation of this
+function.
 
 Note however, that OpenCL is usually loaded as a dynamic library provided by
 vendor. These libraries will usually return only one platform.
@@ -165,7 +166,28 @@ platform.
 
 \subsection{Devices}
 
+Platform, may contain one or more \emph{devices}. Devices are units that
+actually execute the kernel code. Device may map for example to single GPU or
+CPU.
 
+For example, NVIDIA OpenCL implementation presents each GPU available in the
+system as separate device. OpenCL from AMD besides presenting GPUs also presents
+supported CPUs as devices.
+
+Device is last entity in hierarchy that has its distinct API object. Further
+elements cannot be operated on, and are just abstract concepts to which vendors
+map their hardware.
+
+These elements are \emph{compute units} which are comprised of \emph{processing
+elements}. Devices can be queried for number of compute units they contain
+through \texttt{clGetDeviceInfo()} function.
+
+\subsubsection{Mapping physical devices to logical hierarchy}
+
+Exact details of mapping is dependant on OpenCL vendor. Underlying architectures
+of GPUs, CPUs and DSPs\footnote{Digital Singal Processors} can differ greatly
+even within the same class of devices.
+
+\section{Memory types}
 
 \section{Execution model}
-\section{Memory access}
