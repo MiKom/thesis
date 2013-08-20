@@ -10,26 +10,32 @@ parallel GPGPU systems with OpenCL.
 
 \section{Definitions}
 
-\begin{defn}[Density function]
+\begin{defn}
 \label{def:density function}
-Scalar function
+\emph{Density function} is a scalar function of form
 $\mathbb{R}^3\rightarrow\mathbb{R}$ or $\mathbb{R}^2\rightarrow\mathbb{R}$
 that defines value of some magnitude in a continuous space. An example of such
 function in 3D space is temperature defined in each point in the space. Height
 on a flat map on the other hand is a density function in 2D space.
+
+Note that such defined density function doesn't have any connection to
+\emph{probability density function}. It's in fact a special kind of
+\emph{scalar field}. This definition however is commonly used in context of
+rendering isosurfaces \parencite{gpugems3ch01}.
 \end{defn}
 
-\begin{defn}[Isosurface]
-Surface in three-dimensional space that consists of points that have certain
+\begin{defn} \emph{Isosurface} is a
+surface in three-dimensional space that consists of points that have the same
 value of \emph{density function}.
-\end{defn}
-
-\begin{defn}[Isovalue]
-Certain value of density function which will be considered the surface. Points
+Points
 in domain which density function value is below this value are considered to
 lie below the surface and points which density function value is above this
 value are considered to lie above the surface. Points which density function
 value is equal to the isovalue are considered to lie exactly on the isosurface.
+\end{defn}
+
+\begin{defn} \emph{Isovalue} is a value of density function that forms the
+  \emph{isosurface}.
 \end{defn}
 
 \section{Rationale for isosurface rendering}
@@ -95,11 +101,12 @@ is larger or smaller than requested isovalue. If the value on the vertex is
 smaller vertex is below the surface. Otherwise it's above it.
 
 Being above or below the surface will be called the \emph{sign} of the vertex.
-If vertices on the ends of given cube's edge are of different signes, than it's
+If vertices on the ends of given cube's edge are of different signs, than it's
 certain that the surface crosses the edge.
 
 For each cube, there are $2^8=256$ possible combinations of sings of the
-vertices. Combination of the cube is called an \emph{index} of this cube.
+vertices. \todo{Check article} The combination of these singns is called the
+\emph{index} of this cube (see \autoref{fig:mcnumbering}).
 
 When the index of the cube is known, pre-generated LUTs\footnote{Look-Up Tables}
 are consulted to determine how many polygons and in what configuration should be
@@ -107,13 +114,13 @@ emitted for this cube.
 
 Original version of Marching Cubes algorithm divides all 256 possible
 combinations of vertices into 15 cases. These cases are presented in
-\autoref{fig:mccases}. Remaining combinations are derivatives of these cases
-(symmetries, rotations, and complimentary cases).
+\autoref{fig:mccases}. Remaining combinations are derived from these cases
+through applying symmetries, rotations, and switching all signs of cube verices.
 
 Process is repeated for all cubes in the lattice and emitted polygons (possibly
 with normal vectors for lighting) are the output of the algorithm.
 
-\begin{figure}
+\begin{figure}[htb]
   \centerline{
     \begin{tikzpicture}[z={(-0.58cm,-0.28cm)}, scale=1.5]
     \input{chapters/marchingcubes/cases.tex}
@@ -133,10 +140,10 @@ with normal vectors for lighting) are the output of the algorithm.
 Operation on a single cube begins with evaluating density function on each
 vertex of the cube.
 
-Index of the vertex is calculated through operation described below
+Index of the cube is calculated through operation described below
 \autoref{fig:mcnumbering}.
 
-\begin{figure}
+\begin{figure}[hb]
   \centerline{
    \input{chapters/marchingcubes/numbering.tex}
   }
@@ -183,7 +190,8 @@ example\footnote{\url{http://docs.nvidia.com/cuda/cuda-samples/index.html\#march
 
 As described in \autoref{sec:mcdesc} each cube is processed by the algorithm
 independently. This possibly makes this algorithm a good candidate for massive
-parallelization offered by GPGPUs. There are however some obstacles to overcome.
+parallelization offered by general purpose GPU programming. There are however
+some obstacles to overcome.
 
 First, LUTs used by the algorithm are obviously too big to fit into registers.
 Reading them from global memory would also be problematic, because they are
@@ -209,7 +217,7 @@ of the execution will be described below.
 In this stage, all voxels are classified as to whether they will produce any
 geometry or not, and how many vertices is given voxel going to produce.
 
-Results are written to two arrays \texttt{voxelOccupied} which contains 1
+Results are written to two arrays: \texttt{voxelOccupied} which contains 1
 if given voxel produces any geometry and 0 otherwise, and
 \texttt{voxelVerts} that holds number of vertices produced by this voxel:
 \todo{Find out about having single listing with some dialect}
@@ -266,17 +274,17 @@ int getCubeIndex(float4 *cubeValues, float isoValue)
 	}
 	\label{fig:mccompact}
 \end{figure}
-\todo{replace figure \ref{fig:mccompact} with proper graphics}
+\todo{replace figures \ref{fig:mccompact} and \ref{fig:mcvertscan} with proper graphics}
 
 To overcome problem highlighted in \autoref{sec:mcgpu} a special compacting
 operation is performed on arrays from previous step. First, a prefix-sum array
-is computed in parallel on the GPU \footnote{implementation based on \cite{gpugemsscan},
+is computed in parallel on the GPU\footnote{implementation based on \cite{gpugemsscan},
 as included in \href{https://developer.nvidia.com/cuda-downloads}{NVIDIA CUDA SDK}}
 on \texttt{voxelOccupied} and \texttt{voxelVerts} arrays resulting in
 \texttt{voxelOccupiedScan} and \texttt{voxelVertsScan} arrays.
 
 \begin{defn}[Prefix-sum operation \parencite{BlellochTR90}]
-operation that takes binary associative operator $\oplus$ with identity $I$ and
+Operation that takes binary associative operator $\oplus$ with identity $I$ and
 an array of $n$ elements $[a_0,a_1,\ldots,a_{n-1}]$ and returns the array
 $[I,a_0,(a_0\oplus a_1),\ldots,(a_0\oplus a_1 \oplus \ldots \oplus a_{n-2})]$
 
@@ -290,7 +298,7 @@ produce geometry can be obtained. These voxels are called \emph{active voxels}.
 Thanks to voxel compaction, the most computation--intensive kernel, i.e.
 \texttt{generateTriangles} kernel that generates final geometry can be computed
 only for voxels that are not empty. Since in many cases, space on which Marching
-cube is working is rather sparse, this approach can bring enormous performance
+Cubes is working is rather sparse, this approach can bring enormous performance
 gains.
 
 Let call the number of active voxels $n$. Compaction kernel creates an array
