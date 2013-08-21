@@ -182,12 +182,121 @@ These elements are \emph{compute units} which are comprised of \emph{processing
 elements}. Devices can be queried for number of compute units they contain
 through \texttt{clGetDeviceInfo()} function.
 
-\subsubsection{Mapping physical devices to logical hierarchy}
 
 Exact details of mapping is dependant on OpenCL vendor. Underlying architectures
 of GPUs, CPUs and DSPs\footnote{Digital Singal Processors} can differ greatly
 even within the same class of devices.
 
-\section{Memory types}
+Specifics of implementation on selected devices supporting OpenCL will be
+presented in \autoref{sec:climpl}.
+
+\section{Memory model}
+
+\begin{figure}[htpb]
+  \begin{center}
+    \includegraphics[width=\textwidth]{chapters/opencl/memory.png}
+  \end{center}
+  \caption{Abstract memory model of OpenCL \parencite{gaster2012heterogeneous}}
+  \label{fig:clmemmodel}
+\end{figure}\todo{replace \autoref{fig:clmemmodel} with TikZ graphic}
+
+OpenCL provides layer of abstraction on device memory. Depending on the
+capabilities of given device, some of memories described below may be
+unavailable.
+
+Below are descriptions of memories defined by OpenCL specification. They are
+divided to Host-side and Device-side memories.
+
+\subsection{Host-side memory model}
+
+This is the model from the perspective of code that runs on the host. The one
+that executes OpenCL library functions. Three types of memory are distinguishable
+in this context:
+
+\begin{description}
+  \item[Host memory]
+    memory that is allocated by the host code with standard allocation techniques
+    like \texttt{malloc()}. It's not managed by OpenCL runtime.
+  \item[Buffers]
+    objects that are handles for global or constant memory allocated on host.
+    Buffers are similar in nature to flat C arrays. They have linear addressing,
+    so pointer arithmetic is possible in kernel code.
+
+    Buffers differ however in one one crucial point with host memory. Operations
+    on them are asynchronous. Functions like \texttt{clEnqueueReadbuffer()} that
+    transfer data between host and device return immediately, and the transfer
+    starts in the background. Event mechanism may be used for synchronization
+    (see \autoref{sub:clevents}).
+  \item[Images]
+    Images are somewhat similar to buffers, but differ in fundamental way.
+    Unlike buffers, images can be multidimensional. They are not laid flatly in
+    memory, but in a way that preserves spatial locality of points within the
+    image\footnote{For example by Z-order mapping \parencite{gaster2012heterogeneous}},
+    so they cannot be adressed directly but through sampling object, that define
+    access patterns to images. They are also limited in terms of supported
+    datatypes to ones that are relevant in graphics; no arbitrary structures can
+    be held in images.
+
+    Images are abstraction of texturing units available in GPU shaders. Because
+    of this heritage, images are not supported on every OpenCL implementation.
+
+\end{description}
+
+\subsection{Device-side memory model}
+
+These are memories, as seen by kernels.
+
+\begin{description}
+  \item[Global memory]
+    kernel-wide memory that is visible to all compute units on the device.
+    It is the only memory that can be used for transferring data between host and
+    device. This is also usually slowest type of memory on the device by raw
+    throughput.
+  \item[Constant memory]
+    memory designated for data that is going to be accessed simultaneously by
+    many threads. Its contents cannot change throughout the lifetime of the
+    kernel. If available it's usually implemented with specialized hardware
+    and/or caching strategies.
+  \item[Local memory]
+    Special memory area that resembles software-controlled cache. This area is
+    valid only within a single workgroup (see \autoref{subsub:clworkgroups}). It's
+    expected to be much faster than global memory\footnote{However it's not guaranteed},
+    so it can be used as a scratchpad area for threads in one workgroup.
+
+    It may be implemented e.g. as separate chip in Compute Unit.
+
+    Local memory can be declared for workgroup in two ways, either dynamically,
+    by setting kernel parameter prefixed with \texttt{\_\_local} to NULL with desired size
+    parameter, or statically as an array in kernel with the same prefix.
+
+  \item[Private memory]
+    valid within a single thread. Every non-prefixed variable and all function
+    arguments that are not pointers land in this memory. It may be implemented
+    with registers\footnote{GPUs, usually don't have stack, so every variable
+    is stored in very limited number of registers}. If number of registers is
+    exceeded, they may be spilled to global memory, what can have very
+    detrimental impact on performance. Number of registers used by kernel must
+    be thus carefully controlled.
+\end{description}
 
 \section{Execution model}
+\label{sec:clexecmodel}
+\subsection{Context}
+
+\subsection{Programs and Kernels}
+
+\subsection{Command queues}
+
+\subsubsection{Workgroups and threads}
+\label{subsub:clworkgroups}
+
+\subsection{Events and Device-side relaxed consistency}
+\label{sub:clevents}
+
+\subsection{Typical execution flow}
+
+\section{Implementation on selected hardware}
+\label{sec:climpl}
+\subsection{OpenCL on AMD Bulldozer CPU}
+
+\subsection{OpenCL on NVIDIA GTX560Ti}
