@@ -241,6 +241,7 @@ in this context:
     of this heritage, images are not supported on every OpenCL implementation.
 
 \end{description}
+\todo{If time allows, write about pinned memory}
 
 \subsection{Device-side memory model}
 
@@ -266,8 +267,9 @@ These are memories, as seen by kernels.
     It may be implemented e.g. as separate chip in Compute Unit.
 
     Local memory can be declared for workgroup in two ways, either dynamically,
-    by setting kernel parameter prefixed with \texttt{\_\_local} to NULL with desired size
-    parameter, or statically as an array in kernel with the same prefix.
+    by setting kernel parameter prefixed with \texttt{\_\_local} to NULL with
+    desired size parameter, or statically as an array in kernel with the same
+    prefix.
 
   \item[Private memory]
     valid within a single thread. Every non-prefixed variable and all function
@@ -281,7 +283,19 @@ These are memories, as seen by kernels.
 
 \section{Execution model}
 \label{sec:clexecmodel}
+
+This section will describe OpenCL object that mange execution of programs on the
+device and stages of such execution.
+
 \subsection{Context}
+
+Context is a structure that coordinates communication between host and devices
+and keeps information about memory objects. 
+
+Context is created by providing list of devices to \texttt{clCreateContext()}
+function. Devices must all come from the same platform, as returned by
+\texttt{clGetDeviceIDs()}. There is a convenience function \texttt{clCreateContexFromType()}
+that creates context from all devices of given type from one platform \parencite{openclspec}.
 
 \subsection{Programs and Kernels}
 
