@@ -12,6 +12,7 @@ OpenCL is used in programming project described in \autoref{chap:project}.
 Metaballs and Marching Cubes algorithm are implemented with it. Marching Cubes
 algorithm and its OpenCL implementation are described in detail in
 \autoref{chap:marchingcubes}.
+
 \section{Introduction}
 This section is based on \cite{Kirk:2010:PMP:1841511} and
 \cite{gaster2012heterogeneous}.
@@ -279,6 +280,9 @@ These are memories, as seen by kernels.
     exceeded, they may be spilled to global memory, what can have very
     detrimental impact on performance. Number of registers used by kernel must
     be thus carefully controlled.
+
+    Private memory is the fastest available type of memory. For GPUs it's usually
+    orders of magnitude faster than global or local memory.
 \end{description}
 
 \section{Execution model}
@@ -292,17 +296,81 @@ device and stages of such execution.
 Context is a structure that coordinates communication between host and devices
 and keeps information about memory objects. 
 
-Context is created by providing list of devices to \texttt{clCreateContext()}
+It is created by providing list of devices to \texttt{clCreateContext()}
 function. Devices must all come from the same platform, as returned by
 \texttt{clGetDeviceIDs()}. There is a convenience function \texttt{clCreateContexFromType()}
 that creates context from all devices of given type from one platform \parencite{openclspec}.
 
 \subsection{Programs and Kernels}
 
+To execute kernel code on the device, it must be first provided to specialized
+compiler that tranlates human--readable instructions to machine--specific code.
+
+Kernel code must be fed to \texttt{clCreateProgramWithSource()} function in the form of
+pointer to character array. OpenCL implementation takes this textual
+representation and translates in runtime. It's worth noting, that OpenCL kernel
+code is provided to the library in source form. This may be not suitable for
+secret proprietary algorithms. For this reason, with OpenCL 2.0 Provisional
+specification Khronos released specification for common intermediate
+representation called SPIR\footnote{Standard Portable Intermediate Representation
+  \url{http://www.khronos.org/registry/cl/specs/spir_spec-1.2-provisional.pdf}}.
+
+There is another function that creates program objects named\\
+\texttt{clCreateProgramWithBinary()} that takes binary representation of OpenCL
+code. This function however, is highly device--specific. It can only be used
+for caching compiled programs the first time application is run so no compilation
+is needed during subsequent runs.
+
+After creating program object, it isn't yet compiled. Compilation is triggered
+by \texttt{clBuildProgram()} function.
+
+One program object may have been compiled from a source string containing many
+OpenCL kernels. Each function prefixed with \texttt{\_\_kernel} in such string
+may be used to create separate kernel with \texttt{clCreateKernel()} function by
+providing build program object and kernel function name, or with
+\texttt{clCreateKernelsInProgram()} function that creates kernel objects from
+all kernel functions present in program object.
+
+\subsubsection{Supplying arguments to kernels}
+
+Since kernels aren't normal host function, they aren't invoked as such. Because
+of that, arguments for kernels must be supplied in specific way. Each argument
+must be set with separate call to function \texttt{clSetKernelArg()}. This style
+of argument settings resembles the way arguments are supplied to shaders in OpenGL
+or DirectX.
+
 \subsection{Command queues}
+
+With kernel arguments properly set up, it can be queued for execution on the
+device with \texttt{clEnqueueNDRangeKernel()}\footnote{Enqueue N-dimensional range kernel}
+function. Kernels are scheduled for execution on \emph{command queues} --- special objects that are tied to
+particular device and are used for management of tasks on this device.
+
+There may be many command queues created with single
+device\footnote{For e.g. multiple application threads}. Conformant OpenCL
+implementation guarantees, that as long as these command queues don't use the
+same resources, like memories, programs and kernels, at the same time, no
+synchronization is needed. Otherwise, special care must be taken to ensure
+consistency. Using shared objects on many queues is described in Appendix A
+of the OpenCL specification \parencite{openclspec}.
 
 \subsubsection{Workgroups and threads}
 \label{subsub:clworkgroups}
+
+Exactly how many threads are started when kernel is enqueued in command queue
+is determined by \emph{configuration} of the execution. Threads may be organized
+as regular 1D, 2D or 3D structure. Size of this structure for all threads is
+called \emph{global work size}. This structure is further divided into smaller
+packets called \emph{work-groups}. Exactly how task is divided into work--groups
+can be either specified by user or done implicitly by the implementation.
+
+Threads within the work--group can be synchronized with barriers. Also, local
+memory is shared by every thread in the work--group.
+
+OpenCL specification doesn't guarantee any order of execution of work--groups
+in single kernel invocation. Particularly, execution of one work--group may be
+suspended while it waits for data from slow global memory, and another one,
+i.e. one ready to perform calculations, may start or resume execution.
 
 \subsection{Events and Device-side relaxed consistency}
 \label{sub:clevents}
