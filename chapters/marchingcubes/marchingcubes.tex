@@ -105,7 +105,7 @@ If vertices on the ends of given cube's edge are of different signs, than it's
 certain that the surface crosses the edge.
 
 For each cube, there are $2^8=256$ possible combinations of sings of the
-vertices. \todo{Check article} The combination of these singns is called the
+vertices. \todo{Check article} The combination of these signs is called the
 \emph{index} of this cube (see \autoref{fig:mcnumbering}).
 
 When the index of the cube is known, pre-generated LUTs\footnote{Look-Up Tables}
@@ -150,7 +150,7 @@ Index of the cube is calculated through operation described below
   \caption{
     Numbering of vertices and edges in Marching Cubes. Cube index is
     derived by concatenation of bits \texttt{index = v8|v7|v6|v5|v4|v3|v2|v1}
-    where each \texttt{vi} is logical result (0 or 1) of operation of comparing
+    where each \texttt{v}\emph{i} is logical result (0 or 1) of operation of comparing
     density function value at \emph{i}-th vertex with threshold value
     (\texttt{value(i) > threshold}).
   }
@@ -264,7 +264,7 @@ int getCubeIndex(float4 *cubeValues, float isoValue)
 
 \subsubsection{Compacting}
 
-\begin{figure}
+\begin{figure}[hb]
 	\begin{center}
 		\includegraphics[width=\textwidth]{chapters/marchingcubes/compact.jpg}
 	\end{center}
@@ -278,7 +278,7 @@ int getCubeIndex(float4 *cubeValues, float isoValue)
 
 To overcome problem highlighted in \autoref{sec:mcgpu} a special compacting
 operation is performed on arrays from previous step. First, a prefix-sum array
-is computed in parallel on the GPU\footnote{implementation based on \cite{gpugemsscan},
+is computed in parallel on the GPU\footnote{Implementation based on \cite{gpugemsscan},
 as included in \href{https://developer.nvidia.com/cuda-downloads}{NVIDIA CUDA SDK}}
 on \texttt{voxelOccupied} and \texttt{voxelVerts} arrays resulting in
 \texttt{voxelOccupiedScan} and \texttt{voxelVertsScan} arrays.
