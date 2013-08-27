@@ -1,7 +1,9 @@
 \documentclass[twoside,openright,a4paper,12pt]{memoir}
 \usepackage[utf8]{inputenc}
-\usepackage[OT4]{fontenc}
 \usepackage{lmodern}
+\usepackage[sc]{mathpazo}
+\linespread{1.05}
+\usepackage[T1]{fontenc}
 \usepackage[backend=biber,citestyle=authoryear-comp,hyperref=true]{biblatex}
 \usepackage{todonotes}
 \usepackage{graphicx}
@@ -17,11 +19,6 @@
   citecolor=blue
 ]{hyperref}
 \usepackage{cleveref}
-
-\addbibresource{bibliography.bib}
-\addbibresource{chapters/karstification/karstification.bib}
-\addbibresource{chapters/opencl/opencl.bib}
-\addbibresource{chapters/marchingcubes/marchingcubes.bib}
 
 \theoremstyle{definition}
 \newtheorem{defn}{Definition}
@@ -50,7 +47,14 @@
   }
 }
 
+\pagestyle{ruled}
 \setcounter{tocdepth}{3}
+
+\addbibresource{bibliography.bib}
+\addbibresource{chapters/karstification/karstification.bib}
+\addbibresource{chapters/opencl/opencl.bib}
+\addbibresource{chapters/marchingcubes/marchingcubes.bib}
+
 
 \begin{document}
 \title{MODELLING SYSTEM OF KARST CAVES FOR COMPUTER GRAPHICS}
