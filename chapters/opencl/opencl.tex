@@ -98,7 +98,7 @@ Leopard release.
 
 On December 9th, 2008 final specification of OpenCL 1.0 was
 released\footnote{\url{https://www.khronos.org/news/press/the\_khronos\_group\_releases\_opencl\_1.0\_specification}}.
-Releases of conforming implementations from hardware vendors followed\footnote{http://www.khronos.org/conformance/adopters/conformant-products/\#opencl}.
+Releases of conforming implementations from hardware vendors followed\footnote{\url{http://www.khronos.org/conformance/adopters/conformant-products/\#opencl}}.
 
 \subsection{Specification}
 OpenCL specification is maintained by the Khronos Group. It consists of C API
@@ -224,7 +224,7 @@ in this context:
     so pointer arithmetic is possible in kernel code.
 
     Buffers differ however in one one crucial point with host memory. Operations
-    on them are asynchronous. Functions like \texttt{clEnqueueReadbuffer()} that
+    on them are asynchronous. Functions like \texttt{clEnqueue\-Read\-Buffer()} that
     transfer data between host and device return immediately, and the transfer
     starts in the background. Event mechanism may be used for synchronization
     (see \autoref{sub:clevents}).
@@ -343,8 +343,9 @@ or DirectX.
 
 With kernel arguments properly set up, it can be queued for execution on the
 device with \texttt{clEnqueueNDRangeKernel()}\footnote{Enqueue N-dimensional range kernel}
-function. Kernels are scheduled for execution on \emph{command queues} --- special objects that are tied to
-particular device and are used for management of tasks on this device.
+function. Kernels are scheduled for execution on \emph{command queues} --- special
+objects that are tied to particular device and are used for management of tasks
+on this device.
 
 There may be many command queues created with single
 device\footnote{For e.g. multiple application threads}. Conformant OpenCL
@@ -364,6 +365,9 @@ called \emph{global work size}. This structure is further divided into smaller
 packets called \emph{work-groups}. Exactly how task is divided into work--groups
 can be either specified by user or done implicitly by the implementation.
 
+If workgroup size is specified explicitly, global work size must be evenly
+divisible by local work size in each dimension.
+
 Threads within the work--group can be synchronized with barriers. Also, local
 memory is shared by every thread in the work--group.
 
@@ -372,10 +376,38 @@ in single kernel invocation. Particularly, execution of one work--group may be
 suspended while it waits for data from slow global memory, and another one,
 i.e. one ready to perform calculations, may start or resume execution.
 
-\subsection{Events and Device-side relaxed consistency}
+\subsection{Events and device--side relaxed consistency}
 \label{sub:clevents}
 
+Every OpenCL function that could possibly block, is called asynchronously. It
+schedules execution of operation in the command queue and immediately returns.
+
+Synchronization of such tasks is done with \emph{event objects} which are
+returned by all potentially blocking operations. Such objects can be either
+waited for with \texttt{clWaitForEvents()} or be passed to other blocking
+function which in such case guarantee not to start their execution before all
+events passed to them finish.
+
+OpenCL specification also defines \emph{relaxes consistency} memory model \parencite{gaster2012heterogeneous}.
+Until the end of kernel execution, memory writes may not be visible to other
+work--items if fences are not used.
+
+This gives following, three--point hierarchy of memory consistency:
+\begin{itemize}
+  \item Memory operations are ordered predictably within single work--item.
+  \item For work--items within single work--group memory is guaranteed to be
+    consistent only at barriers
+  \item For work--items from different work--groups there is no consistency of
+    memory guaranteed, there are however atomic integer operations on global
+    memory available.
+\end{itemize}
+
+This relaxed model is needed to make it possible to implement OpenCL on wider
+variety of devices. Any stricter model would single out some class of devices.
+
 \subsection{Typical execution flow}
+Applications usually follow common pattern when offloading computation to OpenCL
+devices 
 
 \section{Implementation on selected hardware}
 \label{sec:climpl}
