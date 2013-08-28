@@ -306,7 +306,7 @@ that creates context from all devices of given type from one platform \parencite
 To execute kernel code on the device, it must be first provided to specialized
 compiler that tranlates human--readable instructions to machine--specific code.
 
-Kernel code must be fed to \texttt{clCreateProgramWithSource()} function in the form of
+Kernel code must be fed to \texttt{clCreate\-Program\-WithSource()} function in the form of
 pointer to character array. OpenCL implementation takes this textual
 representation and translates in runtime. It's worth noting, that OpenCL kernel
 code is provided to the library in source form. This may be not suitable for
@@ -316,13 +316,13 @@ representation called SPIR\footnote{Standard Portable Intermediate Representatio
   \url{http://www.khronos.org/registry/cl/specs/spir_spec-1.2-provisional.pdf}}.
 
 There is another function that creates program objects named\\
-\texttt{clCreateProgramWithBinary()} that takes binary representation of OpenCL
+\texttt{clCreate\-Program\-With\-Binary()} that takes binary representation of OpenCL
 code. This function however, is highly device--specific. It can only be used
 for caching compiled programs the first time application is run so no compilation
 is needed during subsequent runs.
 
 After creating program object, it isn't yet compiled. Compilation is triggered
-by \texttt{clBuildProgram()} function.
+by \texttt{cl\-Build\-Program()} function.
 
 One program object may have been compiled from a source string containing many
 OpenCL kernels. Each function prefixed with \texttt{\_\_kernel} in such string
@@ -407,7 +407,29 @@ variety of devices. Any stricter model would single out some class of devices.
 
 \subsection{Typical execution flow}
 Applications usually follow common pattern when offloading computation to OpenCL
-devices 
+devices. There are two main ways this can be done, depending on whether results
+must be read back to the device or not.
+
+When results of the computation must go back to the device, execution usually
+has the following steps:
+
+\begin{enumerate}
+  \item Query platforms available on the system and choose one of them with
+    \texttt{clGetPlatformIDs()} or \texttt{clIcd\-Get\-Platform\-IDsKHR()}
+  \item Query devices available on chosen platform with \texttt{clGet\-DeviceIDs()}
+  \item Create context from selected devices with \texttt{clCreate\-Context()}
+  \item Create command queue for each device in the context with
+    \texttt{clCreate\-Command\-Queue()}
+  \item Create program and kernel objects from kernel source code with
+    \texttt{clCreate\-Program\-With\-[Source,Binary]()} and
+    \texttt{clCreate\-Kernel()}
+  \item Create memory objects with input data and transfer it from host memory
+    to the devices\footnote{Actual transfer may not occur if
+      \texttt{CL\_MEM\_ALLOC\_HOST\_PTR} flag is used when buffer is created and
+      host and device share the same memory. This is possible for example on
+    AMD hybrid APU (Accelerated Processing Unit) systems} with
+    \texttt{clCreate\-Buffer()} and \texttt{clEnqueue\-Write\-Buffer()}
+\end{enumerate}
 
 \section{Implementation on selected hardware}
 \label{sec:climpl}
