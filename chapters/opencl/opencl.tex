@@ -427,12 +427,33 @@ has the following steps:
     to the devices\footnote{Actual transfer may not occur if
       \texttt{CL\_MEM\_ALLOC\_HOST\_PTR} flag is used when buffer is created and
       host and device share the same memory. This is possible for example on
-    AMD hybrid APU (Accelerated Processing Unit) systems} with
+    AMD hybrid APU (Accelerated Processing Unit) systems that share single
+    memory} with
     \texttt{clCreate\-Buffer()} and \texttt{clEnqueue\-Write\-Buffer()}
+  \item Set kernel parameters with \texttt{clSet\-KernelArg()}.
+  \item Enqueue kernel(s) execution with \texttt{clEnqueue\-NDRange\-Kernel()}
+  \item Read back data with \texttt{clEnqueue\-Read\-Buffer()}
 \end{enumerate}
+
+Since OpenCL is quite often implemented with GPUs, it may be used to generate
+data later used for rendering. Results of computations of e.g. fluid simulation
+\parencite{Kolb} or particle systems\footnote{\url{http://software.intel.com/en-us/vcsource/samples/3d-fluid-simulation}}
+don't have to be transferred back to the host memory, they are used for
+rendering frame of animation, and may be discarded, overwritten or used as input
+for next frame. For such use cases, two extensions were developed:
+\begin{itemize}
+  \item \texttt{CL\_KHR\_gl\_sharing} for sharing memory objects with OpenGL
+  \item \texttt{cl\_khr\_d3d10\_sharing} for sharing memory objects with Microsoft DirectX
+\end{itemize}
+With these extensions, round--trips between host an device memory are
+unnecessary. Above steps are thus a bit different, because data is not read back
+but is used as an input for rendering by graphics API.
 
 \section{Implementation on selected hardware}
 \label{sec:climpl}
+In this section, implementations of OpenCL on two different types of devices
+will be presented. One is an AMD Bulldozer CPU -- an 8--core general purpose x86
+processor and NVIDIA GTX580 -- a high--end consumer GPU.
 \subsection{OpenCL on AMD Bulldozer CPU}
 
 \subsection{OpenCL on NVIDIA GTX560Ti}
