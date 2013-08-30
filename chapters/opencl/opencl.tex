@@ -39,7 +39,7 @@ implemented via separate chips in the GPU. In 2005, with release of XBox 360
 first unified architecture was introduced, on which vertex and fragment shaders
 were run on the same processor.
 
-Graphics processing, that these devices were build for is very well suited for
+Graphics processing, that these devices were build for, is very well suited for
 parallelization. Vertex shader stage takes list of vertices as its input and
 maps them onto the screen optionally defining colour of the vertex. Each
 vertex is processed independently making it possible to process many vertices
@@ -159,7 +159,7 @@ vendor. These libraries will usually return only one platform.
 To address this problem Khronos Group introduced \texttt{cl\_khr\_icd} extension
 that depending on operating system, will look for list of installed OpenCL
 ICDs or Installable Client Drivers in place specific for given OS. If
-implementation supports this extension, new function \texttt{clIcdGetPlatformIDsKHR}
+implementation supports this extension, new function \texttt{clIcd\-Get\-Platform\-IDsKHR}
 is available that will present to the user platforms from all vendors available
 on the system. This extension also makes sure, that function calls with OpenCL
 object created in certain platform will be routed to implementations in this
@@ -463,11 +463,9 @@ devices will also be discussed.
 Bulldozer is a microarchitecture of AMD processors released on September 7, 2011\footnote{http://www.amd.com/us/press-releases/Pages/amd-ships-bulldozer-processors-2011sep7.aspx}.
 Described processor is AMD FX--8150, a high--end consumer CPU with 8 x86 cores
 packed into 4 \emph{modules}. Cores within single module share FPU unit,
-instruction decoder and fetching mechanisms, branch predictor, and 2MiB L2 data
+instruction decoding and fetching mechanisms, branch predictor, and 2MiB L2 data
 cache. Each core has its own 16KiB L1 data cache. AMD Implementation of the OpenCL
 runtime for CPUs is based on \cite{gummaraju2010twin}.
-
-
 
 \begin{figure}[htb]
   \begin{center}
@@ -479,4 +477,136 @@ runtime for CPUs is based on \cite{gummaraju2010twin}.
   \label{fig:bulldozerarch}
 \end{figure}
 \todo{Replace \autoref{fig:bulldozerarch} with proper graphics.}
-\subsection{OpenCL on NVIDIA GTX560Ti}
+
+Entire processor is presented to the programmer as a single OpenCL
+device\footnote{However with \emph{device fission} mechanism introduced in OpenCL 1.2 (and
+earlier with extension) it is possible to divide a device into subdevices based on e.g. memory characteristics}
+By default, every core is used to perform computations. For each core, one
+thread for dispatching work--groups is created what effectively creates thread
+of pools pinned to each of the available cores.
+
+\subsubsection{Mapping to OpenCL logical hierarchy}
+If not divided into subdevices, each core of Bulldozer CPU is considered one
+OpenCL compute unit. Since CPU doesn't have any controllable cache, RAM is used
+for all kinds of OpenCL memories. However, special measures are taken, to ensure
+that private memory of work--items and local memory of work--groups is
+laid in a way that is optimal for cache locality.
+\todo{Replace \autoref{fig:clbullexec} with proper graphics}
+\subsubsection{Execution model}
+\begin{figure}[htb]
+  \begin{center}
+    \includegraphics[width=\textwidth]{chapters/opencl/bulldozerexec.png}
+  \end{center}
+  \caption{Execution model of OpenCL on AMD FX--8150 CPU.}
+  \label{fig:clbullexec}
+\end{figure}
+
+Each core of the CPU executes work--groups assigned to it one after another.
+Within each work--group, each work--item is executed serially until barrier
+operation is reached or kernel is finished. When barriers are reached,
+work--item execution is suspended, its local state is saved through
+\texttt{setjmp} system call to be later restored with \texttt{longjmp}.
+Execution then moves to the next work--item within the work--group.
+
+AMD OpenCL
+runtime provide modified version of \texttt{setjmp} and \texttt{longjmp} syscalls
+that work better with CPU branch predictor and maintain program stack alignment.
+This approach is faster than system--level thread preemption because creating
+system threads is much more expensive than aforementioned calls.
+
+Within each work--group vector operations from SSE\footnote{Streaming SIMD
+Extension} and AVX\footnote{Advanced Vector Extension} extensions are heavily
+used to obtain instruction--level parallelism on vector types offered by OpenCL
+language specification.
+
+Worth mentioning is the fact, that main program code is executed on the same
+processor as OpenCL kernels. Heavy computation in the host code of the application
+may severely decrease performance of OpenCL computations.
+
+\subsection{OpenCL on NVIDIA GTX580}
+
+Another class of devices that OpenCL cat be used on, are GPUs. In fact, CUDA and
+later OpenCL emerged from attempts to tame computing potential of these
+highly--parallel graphical unis.
+
+Implementation on one such device, GeForce GTX580 from NVIDIA corporation, based
+on architecture called \emph{Fermi} will be presented based on \cite[p59]{gaster2012heterogeneous}
+and \cite{nvidiafermi}.
+
+GTX 580 is the most advanced graphic card in GeForce series 500 lineup. It
+consists of 16 Compute Units called \emph{Symmetric Multiprocessors} (SMs).
+
+Each SM contains the following elements (see \autoref{fig:fermism}):
+
+\begin{description}
+  \item[32 \emph{CUDA Cores}] compute units containing ALU\footnote{Arithmetic Logic Unit}
+    for integer arithmetic, FPU\footnote{Floating Point unit} for floating point
+    operations conforming to IEEE~754--2008 standard. It also supports multiply--add
+    and fused multiply--add operations.
+  \item[16 load/store units] for calculation of addresses for memory access.
+    These units provide access to data for 16 threads per clock cycle.
+  \item[4 SFUs] Special Function Units for execution of transcendental instructions
+    like sine, cosine, reciprocal and square root
+  \item[2 Warp Schedulers] thread scheduling units that choose 2 packs of 16
+    threads for concurrent execution.
+  \item[Register file] area of fast memory 128KiB in size\footnote{or $2^{15}$ 32-bit elements}
+  \item[Shared memory/L1 cache] 64 KiB of fast memory configurable as
+    16KiB of shared memory and 48KiB of L1 cache or 48KiB of L1 cache and 16 KiB
+    of shared memory
+\end{description}
+\begin{figure}[htb]
+  \begin{center}
+    \includegraphics[width=0.7\textwidth]{chapters/opencl/fermism.png}
+  \end{center}
+  \caption{Hihg--level overview of elements forming Fermi SM}
+  \label{fig:fermism}
+\end{figure}
+\todo{replace \autoref{fig:fermism} with TikZ graphics}
+
+These 16 SMs are accompanied by 6 64-bit GDDR5 memory units forming 384-bit
+memory interface supporting up to 6GiB of DRAM, 768KiB of L2 cache, GigaThread
+engine for distributing blocks\footnote{or work--groups in OpenCL nomenclature}
+among SMs and host interface\footnote{PCI-Express bus}.
+
+\subsubsection{Mapping to OpenCL logical hierarchy}
+
+Single Fermi GPU is visible as one OpenCL device. SMs are equivalent of Compute
+Units, and CUDA cores are mapped to Processing Elements. GDDR5 DRAM implements
+global memory, per--SM shared memory is used for OpenCL local memory,
+register file is used for private memory, and constant memory is located on
+dedicated DRAM units with dedicated cache. Images are implemented using texture
+memory, the same one that is used for graphics processing.
+
+\subsubsection{Execution model}
+
+When kernel is scheduled for execution on Fermi GPU it's enqueued in GigaThread
+engine. This engine distributes work--groups of the kernel among available
+SMs.
+
+When work--group arrives at the SM, it's further divided into units of 32 threads
+called \emph{warps}. At one cycle, two warps are selected that go to each
+Warp Scheduler. Both Warp Schedulers issue one instruction from each warp to
+one of following parts of SM:
+\begin{itemize}
+  \item 16 CUDA cores\footnote{In these case, these 16 threads form a half-warp}
+  \item 16 Load/Store units
+  \item 4 SFUs
+\end{itemize}
+
+Most of instructions in both warps can be issued independently, so this
+dual--scheduling technique helps in achieving peak hardware utilization.
+
+\subsubsection{Pitfalls of OpenCL programming on GPU}
+
+Execution model described earlier clearly prefers execution of same instruction
+on many threads. NVIDIA call this model SIMT or ,,Single Instruction Multiple
+Thread``. When just one thread diverges in code path through e.g. \texttt{if}
+statement, every possible code path must be executed for each thread in a half--warp.
+That's why kernels with divergent code flows should be avoided.
+
+Another problem is usage of registers. Since execution isn't stack--based like
+in x86 CPUs, every local variable must go to Register File on SM that is rather
+small. When too many registers are used, either less blocks will be able to
+be computed at the same time, or register spilling mechanism that uses orders
+of magnitude slower global memory as a backup location for overflowing variables.
+Both of these possibilities may significantly reduce performance.
