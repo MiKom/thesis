@@ -118,7 +118,7 @@ Unofficial bindings for various languages and frameworks also exist. Among other
 \end{itemize}
 
 \section{Logical abstraction of computational resources}
-
+\label{sec:cllogicalabstraction}
 OpenCL aims to be API that lets hardware manufacturers expose various kinds of
 devices to the programmers in a consistent and abstracted way. To fulfil this
 requirement OpenGL defines logical hierarchy of computational resources.
@@ -453,7 +453,28 @@ but is used as an input for rendering by graphics API.
 \label{sec:climpl}
 In this section, implementations of OpenCL on two different types of devices
 will be presented. One is an AMD Bulldozer CPU -- an 8--core general purpose x86
-processor and NVIDIA GTX580 -- a high--end consumer GPU.
-\subsection{OpenCL on AMD Bulldozer CPU}
+processor and NVIDIA GTX580 -- a high--end consumer GPU. High--level hardware
+architecture of both devices will be shown with mapping to OpenCL logical
+device hierarchy (see \autoref{sec:cllogicalabstraction}). Some specific
+considerations that must be taken when designing OpenCL application for the
+devices will also be discussed.
+\subsection{OpenCL on AMD FX--8150 Bulldozer CPU}
 
+Bulldozer is a microarchitecture of AMD processors released on September 7, 2011\footnote{http://www.amd.com/us/press-releases/Pages/amd-ships-bulldozer-processors-2011sep7.aspx}.
+Described processor is AMD FX--8150, a high--end consumer CPU with 8 x86 cores
+packed into 4 \emph{modules}. Cores within single module share FPU unit,
+instruction decoder and fetching mechanisms, branch predictor, and 2MiB L2 data
+cache. Each core has its own 16KiB L1 data cache. Implementation of the OpenCL
+runtime on CPUs is based on \cite{gummaraju2010twin}.
+
+\begin{figure}[htb]
+  \begin{center}
+    \includegraphics[width=\textwidth]{chapters/opencl/bulldozer.png}
+  \end{center}
+  \caption{Block diagram of hardware architecture of AMD FX--8150 CPU. Devices
+    has 8 cores packed into 2--core logical modules sharing FPU unit, 2MiB of
+    L2 data cache, instruction fetching/decoding units and branch predictor.}
+  \label{fig:bulldozerarch}
+\end{figure}
+\todo{Replace \autoref{fig:bulldozerarch} with proper graphics.}
 \subsection{OpenCL on NVIDIA GTX560Ti}
