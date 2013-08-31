@@ -4,11 +4,11 @@ harness computational capabilities of heterogeneous hardware environment on
 which applications are run. Since the introduction of programmable pipeline
 in GPUs\footnote{Graphics Processing Unit} an opportunity appeared to use
 capabilities of these devices to offload highly parallel, computationally
-intensive tasks from main CPU\footnote{Central Processing Unit}. OpenCL can also
-expose dedicated hardware units designed to perform certain specialized tasks
-like Digital Signal Processing.
+intensive tasks from the main CPU\footnote{Central Processing Unit}. OpenCL
+isn't however limited to GPUs. Multi--core processors can also be used through
+its runtime without manual thread management.
 
-OpenCL is used in programming project described in \autoref{chap:project}.
+OpenCL is used in programming project of this thesis described in \autoref{chap:project}.
 Metaballs and Marching Cubes algorithm are implemented with it. Marching Cubes
 algorithm and its OpenCL implementation are described in detail in
 \autoref{chap:marchingcubes}.
@@ -20,21 +20,21 @@ This section is based on \cite{Kirk:2010:PMP:1841511} and
 \subsection{Beginnings of programmable GPUs}
 
 From early 1980s to late 1990s most graphic hardware was fixed--function.
-I.e. dedicated graphics units exposed fixed set of functions that were
+Dedicated graphics units exposed predefined, fixed set of functions that were
 implemented in hardware or drivers. It wasn't possible to write custom program
 that would be executed on the GPU.
 
 As the complexity of fixed--function APIs expanded, hardware vendors implemented
 them with general purpose processors that could run some limited instruction set
-on many processors. This instruction set was used to implement graphics APIs
+on many execution units. This instruction set was used to implement graphics APIs
 like OpenGL or DirectX.
 
 In 2001 NVIDIA released GeForce 3 graphics card that exposed this internal
 instruction set to users of OpenGL and DirectX APIs. ATI technologies followed
 with Radeon 9700 that could also run programs supplied by the user on the GPU.
 DirectX 8 and OpenGL introduced programmable vertex stage. With
-DirectX 9 another programmable stage was introduced, the pixel (or fragment in
-OpenGL terminology) shader. At this point, vertex and pixel shaders were
+DirectX 9 another programmable stage was introduced, the \emph{pixel shader}\footnote{or \emph{fragment program} in
+OpenGL terminology}. At this point, vertex and pixel shaders were
 implemented via separate chips in the GPU. In 2005, with release of XBox 360
 first unified architecture was introduced, on which vertex and fragment shaders
 were run on the same processor.
@@ -52,7 +52,8 @@ the pixel. This also is done independently for each pixel.
 
 With the unification of computational resources in the GPUs they started to
 resemble highly parallel computers. Researchers noted this fact, and tried to
-harness enormous parallel performance for workloads other than graphics.
+harness enormous parallel performance of these devices for workloads other than
+graphics.
 
 GPUs of DirectX 9 era were still designed in graphics processing in mind.
 Although there were programmable stages in the pipeline, types of input and
@@ -62,7 +63,7 @@ his algorithm to 2D screen space with pixel colour as output. Inputs to the
 pixel shader stage had to be supplied by textures.
 
 Even with these issues, researchers who managed to port their algorithms to
-GPUs reported great performance benefits.
+GPUs reported great performance benefits \parencite{gpugems2ch46}.
 
 \subsubsection{CUDA}
 
@@ -102,7 +103,7 @@ Releases of conforming implementations from hardware vendors followed\footnote{\
 
 \subsection{Specification}
 OpenCL specification is maintained by the Khronos Group. It consists of C API
-and Kernel language that is similar to C99. Khronos releases official C++
+and Kernel language that is similar to C99. Khronos also releases official C++
 wrapper API\footnote{This wrapper API is used in programming project of this thesis}.
 
 Unofficial bindings for various languages and frameworks also exist. Among others
@@ -144,20 +145,21 @@ Diagram of this logical structure is presented in \autoref{fig:clhw}.
 
 \subsection{Platforms}
 
-On the top of the hierarchy is \emph{Platform}. It is usually an implementation
+On the top of the hierarchy there is a \emph{Platform}. It is usually an implementation
 of OpenCL by a single vendor. To query list of available platform in the system
 function \texttt{clGetPlatformIds()} must be called twice. Once with parameter
 \texttt{platforms} set to \texttt{NULL} to obtain number of platforms, and
 second time, with \texttt{platform} parameter set to array that will fit
 number of \texttt{cl\_platform\_id} structures equal or greater than the number
 in argument \texttt{num\_platforms} retrieved on first invocation of this
-function.
+function\footnote{This pattern should be used for discovering other types of resources
+in OpenCL as well}.
 
 Note however, that OpenCL is usually loaded as a dynamic library provided by
 vendor. These libraries will usually return only one platform.
 
 To address this problem Khronos Group introduced \texttt{cl\_khr\_icd} extension
-that depending on operating system, will look for list of installed OpenCL
+that will look for list of installed OpenCL
 ICDs or Installable Client Drivers in place specific for given OS. If
 implementation supports this extension, new function \texttt{clIcd\-Get\-Platform\-IDsKHR}
 is available that will present to the user platforms from all vendors available
@@ -206,19 +208,19 @@ capabilities of given device, some of memories described below may be
 unavailable.
 
 Below are descriptions of memories defined by OpenCL specification. They are
-divided to Host-side and Device-side memories.
+divided to Host--side and Device--side memories.
 
-\subsection{Host-side memory model}
+\subsection{Host--side memory model}
 
 This is the model from the perspective of code that runs on the host. The one
 that executes OpenCL library functions. Three types of memory are distinguishable
 in this context:
 
 \begin{description}
-  \item[Host memory]
-    memory that is allocated by the host code with standard allocation techniques
+  \item[Host memory] \hfill \\
+    this memory is allocated by the host code with standard allocation techniques
     like \texttt{malloc()}. It's not managed by OpenCL runtime.
-  \item[Buffers]
+  \item[Buffers] \hfill \\
     objects that are handles for global or constant memory allocated on host.
     Buffers are similar in nature to flat C arrays. They have linear addressing,
     so pointer arithmetic is possible in kernel code.
@@ -228,18 +230,18 @@ in this context:
     transfer data between host and device return immediately, and the transfer
     starts in the background. Event mechanism may be used for synchronization
     (see \autoref{sub:clevents}).
-  \item[Images]
+  \item[Images] \hfill \\
     Images are somewhat similar to buffers, but differ in fundamental way.
     Unlike buffers, images can be multidimensional. They are not laid flatly in
     memory, but in a way that preserves spatial locality of points within the
-    image\footnote{For example by Z-order mapping \parencite{gaster2012heterogeneous}},
+    image\footnote{For example by Z--order mapping \parencite[p. 111-113]{gaster2012heterogeneous}},
     so they cannot be adressed directly but through sampling object, that define
     access patterns to images. They are also limited in terms of supported
     datatypes to ones that are relevant in graphics; no arbitrary structures can
     be held in images.
 
     Images are abstraction of texturing units available in GPU shaders. Because
-    of this heritage, images are not supported on every OpenCL implementation.
+    of this heritage, images are not supported by every OpenCL implementation.
 
 \end{description}
 \todo{If time allows, write about pinned memory}
@@ -249,18 +251,18 @@ in this context:
 These are memories, as seen by kernels.
 
 \begin{description}
-  \item[Global memory]
+  \item[Global memory] \hfill \\
     kernel-wide memory that is visible to all compute units on the device.
     It is the only memory that can be used for transferring data between host and
-    device. This is also usually slowest type of memory on the device by raw
+    devices. This is also usually slowest type of memory on the device by raw
     throughput.
-  \item[Constant memory]
+  \item[Constant memory] \hfill \\
     memory designated for data that is going to be accessed simultaneously by
     many threads. Its contents cannot change throughout the lifetime of the
     kernel. If available it's usually implemented with specialized hardware
     and/or caching strategies.
-  \item[Local memory]
-    Special memory area that resembles software-controlled cache. This area is
+  \item[Local memory] \hfill \\
+    Special memory area that resembles software--controlled cache. This area is
     valid only within a single workgroup (see \autoref{subsub:clworkgroups}). It's
     expected to be much faster than global memory\footnote{However it's not guaranteed},
     so it can be used as a scratchpad area for threads in one workgroup.
@@ -272,10 +274,10 @@ These are memories, as seen by kernels.
     desired size parameter, or statically as an array in kernel with the same
     prefix.
 
-  \item[Private memory]
+  \item[Private memory] \hfill \\
     valid within a single thread. Every non-prefixed variable and all function
     arguments that are not pointers land in this memory. It may be implemented
-    with registers\footnote{GPUs, usually don't have stack, so every variable
+    with registers\footnote{execution on GPUs isn't stack--based, so every variable
     is stored in very limited number of registers}. If number of registers is
     exceeded, they may be spilled to global memory, what can have very
     detrimental impact on performance. Number of registers used by kernel must
@@ -298,25 +300,26 @@ and keeps information about memory objects.
 
 It is created by providing list of devices to \texttt{clCreateContext()}
 function. Devices must all come from the same platform, as returned by
-\texttt{clGetDeviceIDs()}. There is a convenience function \texttt{clCreateContexFromType()}
+\texttt{clGetDeviceIDs()}. There is a convenience function \texttt{clCreate\-Contex\-FromType()}
 that creates context from all devices of given type from one platform \parencite{openclspec}.
 
 \subsection{Programs and Kernels}
 
 To execute kernel code on the device, it must be first provided to specialized
-compiler that tranlates human--readable instructions to machine--specific code.
+compiler that tranlates human--readable source code to machine--specific
+instructions.
 
 Kernel code must be fed to \texttt{clCreate\-Program\-WithSource()} function in the form of
 pointer to character array. OpenCL implementation takes this textual
-representation and translates in runtime. It's worth noting, that OpenCL kernel
-code is provided to the library in source form. This may be not suitable for
+representation and translates it in runtime. It's worth noting, that OpenCL kernel
+code is provided to the library in the source form. This may be not suitable for
 secret proprietary algorithms. For this reason, with OpenCL 2.0 Provisional
-specification Khronos released specification for common intermediate
+specification, Khronos released definition of common intermediate
 representation called SPIR\footnote{Standard Portable Intermediate Representation
   \url{http://www.khronos.org/registry/cl/specs/spir_spec-1.2-provisional.pdf}}.
 
 There is another function that creates program objects named\\
-\texttt{clCreate\-Program\-With\-Binary()} that takes binary representation of OpenCL
+\texttt{clCreate\-Program\-With\-Binary()}. It takes binary representation of OpenCL
 code. This function however, is highly device--specific. It can only be used
 for caching compiled programs the first time application is run so no compilation
 is needed during subsequent runs.
@@ -326,7 +329,7 @@ by \texttt{cl\-Build\-Program()} function.
 
 One program object may have been compiled from a source string containing many
 OpenCL kernels. Each function prefixed with \texttt{\_\_kernel} in such string
-may be used to create separate kernel with \texttt{clCreateKernel()} function by
+may be used to create separate kernel with \texttt{clCreate\-Kernel()} function by
 providing build program object and kernel function name, or with
 \texttt{clCreateKernelsInProgram()} function that creates kernel objects from
 all kernel functions present in program object.
@@ -368,11 +371,11 @@ can be either specified by user or done implicitly by the implementation.
 If workgroup size is specified explicitly, global work size must be evenly
 divisible by local work size in each dimension.
 
-Threads within the work--group can be synchronized with barriers. Also, local
+Threads within a work--group can be synchronized with barriers. Also, local
 memory is shared by every thread in the work--group.
 
 OpenCL specification doesn't guarantee any order of execution of work--groups
-in single kernel invocation. Particularly, execution of one work--group may be
+in a single kernel invocation. Particularly, execution of one work--group may be
 suspended while it waits for data from slow global memory, and another one,
 i.e. one ready to perform calculations, may start or resume execution.
 
@@ -385,7 +388,7 @@ schedules execution of operation in the command queue and immediately returns.
 Synchronization of such tasks is done with \emph{event objects} which are
 returned by all potentially blocking operations. Such objects can be either
 waited for with \texttt{clWaitForEvents()} or be passed to other blocking
-function which in such case guarantee not to start their execution before all
+functions which in such case guarantee not to start their execution before all
 events passed to them finish.
 
 OpenCL specification also defines \emph{relaxes consistency} memory model \parencite{gaster2012heterogeneous}.
@@ -394,7 +397,8 @@ work--items if fences are not used.
 
 This gives following, three--point hierarchy of memory consistency:
 \begin{itemize}
-  \item Memory operations are ordered predictably within single work--item.
+  \item Memory operations are ordered predictably within single work--item. They
+    won't be reordered by the compiler.
   \item For work--items within single work--group memory is guaranteed to be
     consistent only at barriers
   \item For work--items from different work--groups there is no consistency of
@@ -408,7 +412,7 @@ variety of devices. Any stricter model would single out some class of devices.
 \subsection{Typical execution flow}
 Applications usually follow common pattern when offloading computation to OpenCL
 devices. There are two main ways this can be done, depending on whether results
-must be read back to the device or not.
+must be read back to the host memory or not.
 
 When results of the computation must go back to the device, execution usually
 has the following steps:
@@ -421,7 +425,7 @@ has the following steps:
   \item Create command queue for each device in the context with
     \texttt{clCreate\-Command\-Queue()}
   \item Create program and kernel objects from kernel source code with
-    \texttt{clCreate\-Program\-With\-[Source,Binary]()} and
+    \texttt{clCreate\-Program\-With\-[Source,Binary]()}, \texttt{clBuild\-Program()} and
     \texttt{clCreate\-Kernel()}
   \item Create memory objects with input data and transfer it from host memory
     to the devices\footnote{Actual transfer may not occur if
@@ -456,7 +460,7 @@ will be presented. One is an AMD Bulldozer CPU -- an 8--core general purpose x86
 processor and NVIDIA GTX580 -- a high--end consumer GPU. High--level hardware
 architecture of both devices will be shown with mapping to OpenCL logical
 device hierarchy (see \autoref{sec:cllogicalabstraction}). Some specific
-considerations that must be taken when designing OpenCL application for the
+considerations that must be taken when designing OpenCL application for these
 devices will also be discussed.
 \subsection{OpenCL on AMD FX--8150 Bulldozer CPU}
 
@@ -525,32 +529,34 @@ may severely decrease performance of OpenCL computations.
 
 \subsection{OpenCL on NVIDIA GTX580}
 
-Another class of devices that OpenCL cat be used on, are GPUs. In fact, CUDA and
-later OpenCL emerged from attempts to tame computing potential of these
-highly--parallel graphical unis.
+NVIDA GeForce GTX 580 is the most advanced graphic card in GeForce series 500 lineup.
+It's a consumer graphics card aimed at users with highest performance needs.
+GTX 580 is based on architecture called \emph{Fermi} and will be presented based on
+\cite[p59]{gaster2012heterogeneous} and \cite{nvidiafermi}.
 
-Implementation on one such device, GeForce GTX580 from NVIDIA corporation, based
-on architecture called \emph{Fermi} will be presented based on \cite[p59]{gaster2012heterogeneous}
-and \cite{nvidiafermi}.
-
-GTX 580 is the most advanced graphic card in GeForce series 500 lineup. It
-consists of 16 Compute Units called \emph{Symmetric Multiprocessors} (SMs).
+GTX 580 contains 16 Compute Units called \emph{Symmetric Multiprocessors} (SMs).
 
 Each SM contains the following elements (see \autoref{fig:fermism}):
 
 \begin{description}
-  \item[32 \emph{CUDA Cores}] compute units containing ALU\footnote{Arithmetic Logic Unit}
+  \item[32 \emph{CUDA Cores}] \hfill \\
+    compute units containing ALU\footnote{Arithmetic Logic Unit}
     for integer arithmetic, FPU\footnote{Floating Point unit} for floating point
     operations conforming to IEEE~754--2008 standard. It also supports multiply--add
     and fused multiply--add operations.
-  \item[16 load/store units] for calculation of addresses for memory access.
+  \item[16 load/store units] \hfill \\
+    units for calculation of addresses for memory access.
     These units provide access to data for 16 threads per clock cycle.
-  \item[4 SFUs] Special Function Units for execution of transcendental instructions
+  \item[4 SFUs] \hfill \\
+    Special Function Units for execution of transcendental instructions
     like sine, cosine, reciprocal and square root
-  \item[2 Warp Schedulers] thread scheduling units that choose 2 packs of 16
-    threads for concurrent execution.
-  \item[Register file] area of fast memory 128KiB in size\footnote{or $2^{15}$ 32-bit elements}
-  \item[Shared memory/L1 cache] 64 KiB of fast memory configurable as
+  \item[2 Warp Schedulers] \hfill \\
+    thread scheduling units that choose 2 packs of 16 threads for concurrent
+    execution.
+  \item[Register file] \hfill \\
+    area of fast memory 128KiB in size\footnote{or $2^{15}$ 32-bit elements}
+  \item[Shared memory/L1 cache] \hfill \\
+    64 KiB of fast memory configurable as
     16KiB of shared memory and 48KiB of L1 cache or 48KiB of L1 cache and 16 KiB
     of shared memory
 \end{description}
@@ -563,10 +569,14 @@ Each SM contains the following elements (see \autoref{fig:fermism}):
 \end{figure}
 \todo{replace \autoref{fig:fermism} with TikZ graphics}
 
-These 16 SMs are accompanied by 6 64-bit GDDR5 memory units forming 384-bit
-memory interface supporting up to 6GiB of DRAM, 768KiB of L2 cache, GigaThread
-engine for distributing blocks\footnote{or work--groups in OpenCL nomenclature}
-among SMs and host interface\footnote{PCI-Express bus}.
+These 16 SMs are accompanied by following units in the chip
+\begin{itemize}
+  \item 6 64-bit GDDR5 memory units forming 384-bit
+memory interface supporting up to 6GiB of DRAM, 768KiB of L2 cache
+  \item GigaThread engine for distributing blocks\footnote{or work--groups in OpenCL nomenclature}
+  among SMs
+  \item host interface\footnote{PCI-Express bus}.
+\end{itemize}
 
 \subsubsection{Mapping to OpenCL logical hierarchy}
 
