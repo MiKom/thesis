@@ -218,10 +218,10 @@ in this context:
 
 \begin{description}
   \item[Host memory] \hfill \\
-    this memory is allocated by the host code with standard allocation techniques
-    like \texttt{malloc()}. It's not managed by OpenCL runtime.
+    Memory allocated by the host code with standard allocation techniques
+    like \texttt{malloc()}. It's not managed by the OpenCL runtime.
   \item[Buffers] \hfill \\
-    objects that are handles for global or constant memory allocated on host.
+    Objects that are handles for global or constant memory allocated on host.
     Buffers are similar in nature to flat C arrays. They have linear addressing,
     so pointer arithmetic is possible in kernel code.
 
@@ -231,7 +231,7 @@ in this context:
     starts in the background. Event mechanism may be used for synchronization
     (see \autoref{sub:clevents}).
   \item[Images] \hfill \\
-    Images are somewhat similar to buffers, but differ in fundamental way.
+    Images are somewhat similar to buffers, but differ in several ways.
     Unlike buffers, images can be multidimensional. They are not laid flatly in
     memory, but in a way that preserves spatial locality of points within the
     image\footnote{For example by Z--order mapping \parencite[p. 111-113]{gaster2012heterogeneous}},
@@ -248,16 +248,16 @@ in this context:
 
 \subsection{Device-side memory model}
 
-These are memories, as seen by kernels.
+These are OpenCL memory types, as seen from kernel perspective.
 
 \begin{description}
   \item[Global memory] \hfill \\
-    kernel-wide memory that is visible to all compute units on the device.
+    Kernel-wide memory that is visible to all compute units on the device.
     It is the only memory that can be used for transferring data between host and
     devices. This is also usually slowest type of memory on the device by raw
     throughput.
   \item[Constant memory] \hfill \\
-    memory designated for data that is going to be accessed simultaneously by
+    Memory designated for data that is going to be accessed simultaneously by
     many threads. Its contents cannot change throughout the lifetime of the
     kernel. If available it's usually implemented with specialized hardware
     and/or caching strategies.
@@ -275,7 +275,7 @@ These are memories, as seen by kernels.
     prefix.
 
   \item[Private memory] \hfill \\
-    valid within a single thread. Every non-prefixed variable and all function
+    Memory valid within a single thread. Every non-prefixed variable and all function
     arguments that are not pointers land in this memory. It may be implemented
     with registers\footnote{execution on GPUs isn't stack--based, so every variable
     is stored in very limited number of registers}. If number of registers is
@@ -513,7 +513,7 @@ work--item execution is suspended, its local state is saved through
 Execution then moves to the next work--item within the work--group.
 
 AMD OpenCL
-runtime provide modified version of \texttt{setjmp} and \texttt{longjmp} syscalls
+runtime provides modified version of \texttt{setjmp} and \texttt{longjmp} syscalls
 that work better with CPU branch predictor and maintain program stack alignment.
 This approach is faster than system--level thread preemption because creating
 system threads is much more expensive than aforementioned calls.
@@ -534,27 +534,28 @@ It's a consumer graphics card aimed at users with highest performance needs.
 GTX 580 is based on architecture called \emph{Fermi} and will be presented based on
 \cite[p59]{gaster2012heterogeneous} and \cite{nvidiafermi}.
 
+\subsubsection{Architecture}
 GTX 580 contains 16 Compute Units called \emph{Symmetric Multiprocessors} (SMs).
-
-Each SM contains the following elements (see \autoref{fig:fermism}):
+Each SM contains the following elements (for graphical diagram see
+\autoref{fig:fermism}):
 
 \begin{description}
   \item[32 \emph{CUDA Cores}] \hfill \\
-    compute units containing ALU\footnote{Arithmetic Logic Unit}
-    for integer arithmetic, FPU\footnote{Floating Point unit} for floating point
+    Compute units containing ALU\footnote{Arithmetic Logic Unit}
+    for integer arithmetic and FPU\footnote{Floating Point unit} for floating point
     operations conforming to IEEE~754--2008 standard. It also supports multiply--add
     and fused multiply--add operations.
   \item[16 load/store units] \hfill \\
-    units for calculation of addresses for memory access.
-    These units provide access to data for 16 threads per clock cycle.
+    These units calculate addresses for memory access. They provide access to
+    data for 16 threads per clock cycle.
   \item[4 SFUs] \hfill \\
     Special Function Units for execution of transcendental instructions
     like sine, cosine, reciprocal and square root
   \item[2 Warp Schedulers] \hfill \\
-    thread scheduling units that choose 2 packs of 16 threads for concurrent
+    Thread scheduling units that choose 2 packs of 16 threads for concurrent
     execution.
   \item[Register file] \hfill \\
-    area of fast memory 128KiB in size\footnote{or $2^{15}$ 32-bit elements}
+    Area of very fast memory, 128KiB in size\footnote{or $2^{15}$ 32-bit elements}
   \item[Shared memory/L1 cache] \hfill \\
     64 KiB of fast memory configurable as
     16KiB of shared memory and 48KiB of L1 cache or 48KiB of L1 cache and 16 KiB
@@ -572,26 +573,25 @@ Each SM contains the following elements (see \autoref{fig:fermism}):
 These 16 SMs are accompanied by following units in the chip
 \begin{itemize}
   \item 6 64-bit GDDR5 memory units forming 384-bit
-memory interface supporting up to 6GiB of DRAM, 768KiB of L2 cache
+memory interface that supports up to 6GiB of DRAM, 768KiB of L2 cache
   \item GigaThread engine for distributing blocks\footnote{or work--groups in OpenCL nomenclature}
   among SMs
-  \item host interface\footnote{PCI-Express bus}.
+  \item host communication interface\footnote{PCI-Express bus}.
 \end{itemize}
 
 \subsubsection{Mapping to OpenCL logical hierarchy}
 
-Single Fermi GPU is visible as one OpenCL device. SMs are equivalent of Compute
+Single Fermi GPU is visible as one OpenCL device. SMs are equivalent to Compute
 Units, and CUDA cores are mapped to Processing Elements. GDDR5 DRAM implements
 global memory, per--SM shared memory is used for OpenCL local memory,
 register file is used for private memory, and constant memory is located on
-dedicated DRAM units with dedicated cache. Images are implemented using texture
+dedicated DRAM units with separate cache. Images are implemented using texture
 memory, the same one that is used for graphics processing.
 
 \subsubsection{Execution model}
 
 When kernel is scheduled for execution on Fermi GPU it's enqueued in GigaThread
-engine. This engine distributes work--groups of the kernel among available
-SMs.
+engine that distributes work--groups among available SMs.
 
 When work--group arrives at the SM, it's further divided into units of 32 threads
 called \emph{warps}. At one cycle, two warps are selected that go to each
@@ -608,7 +608,7 @@ dual--scheduling technique helps in achieving peak hardware utilization.
 
 \subsubsection{Pitfalls of OpenCL programming on GPU}
 
-Execution model described earlier clearly prefers execution of same instruction
+Execution model described in previous section clearly prefers execution of the same instruction
 on many threads. NVIDIA call this model SIMT or ,,Single Instruction Multiple
 Thread``. When just one thread diverges in code path through e.g. \texttt{if}
 statement, every possible code path must be executed for each thread in a half--warp.
@@ -620,3 +620,7 @@ small. When too many registers are used, either less blocks will be able to
 be computed at the same time, or register spilling mechanism that uses orders
 of magnitude slower global memory as a backup location for overflowing variables.
 Both of these possibilities may significantly reduce performance.
+
+As mentioned before, execution of threads on GPU isn't stack based. All function
+calls in kernels are inlined. Therefore, algorithms that rely on recursion with
+arbitrary depth may be very hard to implement.
