@@ -207,7 +207,11 @@ will not work.
 
 \subsection{Stages in GPU implementation}
 Kernel execution is divided into the following stages:
-\todo{insert image with stages diagram}
+\begin{enumerate}
+  \item voxel classification
+  \item compacting
+  \item triangle generation
+\end{enumerate}
 
 All operations are performed on cube lattice flattened to 1D array. Each stage
 of the execution will be described below.
@@ -336,7 +340,7 @@ For an example refer to \autoref{fig:mcvertscan}.
 	\label{fig:mcvertscan}
 \end{figure}
 
-\subsubsection{Generating trangles}
+\subsubsection{Generating triangles}
 
 Triangle generation is handled by \texttt{generateTriangles} kernel. It figures
 out the number of voxel it's working on from \texttt{compactedVoxelArray}. Next,
