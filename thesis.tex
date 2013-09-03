@@ -1,4 +1,5 @@
 \documentclass[twoside,openright,a4paper,12pt]{memoir}
+%package inclusions
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
 \usepackage[sc]{mathpazo}
@@ -20,9 +21,12 @@
 ]{hyperref}
 \usepackage{cleveref}
 
+
+%define AMS theorem (definition)
 \theoremstyle{definition}
 \newtheorem{defn}{Definition}
 
+%listings default parameters
 \lstset{
   language=[ISO]C++,
   breaklines=true,
@@ -32,6 +36,7 @@
   stepnumber=2
 }
 
+%defining OpenCL keywords for listings
 \lstdefinelanguage{opencl}[ISO]{C++} {
   morekeywords={
     float2,float3,float4,int2,int3,int4,uint,uin2,uint3,uint4,
@@ -47,9 +52,11 @@
   }
 }
 
+%document opetions
 \pagestyle{ruled}
 \setcounter{tocdepth}{3}
 
+%bibliography for each chapter
 \addbibresource{bibliography.bib}
 \addbibresource{chapters/karstification/karstification.bib}
 \addbibresource{chapters/opencl/opencl.bib}
@@ -62,7 +69,7 @@
 
 \maketitle
 \listoftodos
-\newpage
+\newpage\null\thispagestyle{empty}\newpage
 
 \begin{center}
   \LARGE{Oświadczenie}
@@ -109,6 +116,7 @@ okazało się nieprawdziwe, decyzja o wydaniu mi dyplomu zostanie cofnięta.
 \footnotesize
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{\baselineskip}
+\newpage\null\thispagestyle{empty}\newpage
 \copyright 2011 --- 2013 Miłosz Kosobucki \\
 All rights reserved
 \endgroup
