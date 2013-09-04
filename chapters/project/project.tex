@@ -91,26 +91,86 @@ forming structure with somewhat ,,organic'' look and feel (see \autoref{fig:meta
 
 \subsection{Overview}
 Both blobber and mcblob are implemented in C++ language with latest C++11
-version of the standard. Build system used to compile the code is \emph{CMake}\footnote{\url{http://cmake.org}}
--- cross platform make that can generate native projects for various IDEs.
-Executables use Boost Program Options\footnote{\url{http://www.boost.org/doc/libs/1\_54\_0/doc/html/program\_options.html}}
-library for parsing command line arguments and providing help.
+version of the standard. Build system used to compile the code is \emph{CMake}\footnote{Cross--platform make}
+-- meta build syste that can generate native projects for various IDEs and
+actual build systems.
+Executables use \emph{Boost Program Options} library for parsing command line
+arguments and providing help.
 
 Karstgen uses unit testing framework \emph{Google~Test}\footnote{\url{http://code.google.com/p/googletest/}}.
-Documentation is automatically generated from sources with Doxygen\footnote{\url{http://doxygen.org}}
+Documentation is automatically generated from sources with Doxygen
 tool.
+
 
 \subsection{Blobber}
 
+For vector data structuers blobber uses \emph{GLM}\footnote{\url{http://glm.g-truc.net/0.9.4/index.html}}
+-- a mathematical library that resembles GLSL.
+
+It reads information about diameters of fractures in fractures network
+and places blobs along these fractures with diameters roughly the same as of
+these fractures.
+
+Blobber works on structure calleed \texttt{DataPoint}:
 
 \begin{lstlisting}
 struct DataPoint
 {
-	int x, y, z;
+  	int x, y, z;
 	float midDiam;
 	std::vector<float> xData;
 	std::vector<float> yData;
 	std::vector<float> zData;
 };
 \end{lstlisting}
+
+This structure can describe three fractures originating in index $(x,y,z)$ in
+the fracture net and going along each axe in ascending direction. Each fracture
+is described as a vector of uniformly distributed diameters. If there is only
+one diameter in a vector it is assumed that the fraction it represens has the
+same diameter along its whole length. When no diameters are present in some
+vector it is assumed that there is no fracture in this direction.
+Additional field \texttt{midDiam} is a diameter of blob that should be placed in
+the intersection of the three fractures.
+
+\begin{figure}[hbp]
+  \begin{center}
+    \includegraphics[width=\textwidth]{chapters/project/datapoint.jpg}
+  \end{center}
+  \caption{Graphical representation of \texttt{dataPoint} -- a basic structure that
+blobber works on}
+  \label{fig:datapoint}
+\end{figure}
+
+Data points are packed into a structure representing whole fracture network
+called \texttt{FractureNet}:
+\begin{lstlisting}[label={lst:fracturenet},escapeinside={@}{@}]
+struct FractureNet
+{
+	//size of net in number of dataPoints
+	int x; int y; int z;
+	
+	//length of single fracture in each direction
+	float xLen; float yLen; float zLen;
+	
+	std::map<std::tuple<int, int, int>, DataPoint> dataPoints;
+};
+\end{lstlisting}
+
+Since fracture net is usually quite sparse dictionary structure
+(\texttt{std::map} from STL\footnote{Standard Template Library} exactly) is
+used to store data points instead of array or vector. Keys in this dictionary
+are tuples containing 3D index in a fracture net.
+
+\subsubsection{Placement of blobs}
+
+Blobber works on one data point at a time through \texttt{blobsFromDataPoint()}
+function. Vector for each non--empty axe in given data point is processed
+independently by \texttt{blobsOnVector()} function. Besides the vector of diameters, this
+function takes \texttt{midPointDiam} of the data point, and optionally
+\texttt{nextDpMidDiam} which is \texttt{midPointDiam} of the next data point
+along this axis if such data point exists. Dictionary storage of data points
+makes it easy to retrieve neighbour data points. If there is no neighbour data
+point at the end of the axis \texttt{nextDpMidDiam} is considered to be 0.
+
 \subsection{Mcblob}
