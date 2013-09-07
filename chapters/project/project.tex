@@ -263,4 +263,21 @@ the results to disk in format selected by the user. Wavefront OBJ outpu can be
 read by virtually every 3D graphics software and AVR can be read by aforementioned
 Vorticity game engine.
 
+\subsection{Using \texttt{blobber} and \texttt{mcblob} together}
 
+Blobber and mcblob are naturally fit to be executed in shell via piping. To
+run karstgen with provided examples, go to folder where it was compiled and
+type:
+\begin{verbatim}
+cat [input] | ./blobber | ./mcblob -o out.obj
+\end{verbatim}
+Where \texttt{[input]} is a path to a file with description of fracture net.
+Examples are located in \texttt{examples\\blobber}.
+This will generate \texttt{out.obj} file that can be imported to 3D graphics
+program.
+
+To randomly disturb positions of blobs by 15\% and sizes by 10\% of their
+diameter, invoke karstgen in the following manner:
+\begin{verbatim}
+cat [input] | ./blobber -p 15 -s 10 | ./mcblob -o out.obj
+\end{verbatim}
