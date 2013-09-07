@@ -112,7 +112,7 @@ It reads information about diameters of fractures in fractures network
 and places blobs along these fractures with diameters roughly the same as of
 these fractures.
 
-Blobber works on structure calleed \texttt{DataPoint}:
+Blobber works on data structure name \texttt{DataPoint}:
 
 \begin{lstlisting}
 struct DataPoint
@@ -203,3 +203,64 @@ its help:
 \end{verbatim}
 
 \subsection{Mcblob}
+
+Mcblob uses OpenCL (\autoref{chap:cl}) to calculate density function from
+list of blobs provided in input, generates polygon mesh of isosurface
+definded by this function using marching cubes algorithm (\autoref{chap:marchingcubes})
+accelerated with OpenCL and saves results to file in one of two formats.
+
+Bounds of 3D space within which geometry will be generated is defined in input.
+It's divided into blocks which are worked on one at a time. For each block,
+density function is calculated from blobs, followed by generating geometry.
+
+Finally, when geometry from all blocks is calculated, mcblob writes output to
+disk in one of two supported formats.
+
+\subsubsection{Calculating density function}
+
+Each block of voxels is kept by mcblob in a class called \texttt{Grid}. It
+contains values of density function on the vertices of the cubes in a block.
+These values are stored as one--dimensional array, that is transferable between host and
+device memory. If number of voxels on $x$, $y$ and $z$ axes is $v_x$, $v_y$
+and $v_z$ respectively, \texttt{Grid} will store 1D array
+of \texttt{float4} values $(v_x+1)\times(v_y+1)\times(v_z+1)$ elements long.
+
+\begin{figure}[tb]
+  \begin{center}
+    \input{chapters/project/grid.tex}
+  \end{center}
+  \caption{In this configuration, domain is divided into $2\times2\times2=8$
+  grids, and each one of them consists of $8\times8\times8=512$ voxels totalling
+ $512\times8=4096$ voxels.}
+  \label{fig:grid}
+\end{figure}
+
+Four floats are kept for each vertex instead of one to facilitate computation of
+normal vectors. In case of \texttt{Grid} components $x$, $y$ and
+$z$ store density function values in positions shifted by small value along
+respective axes and $w$ component stores value at the vertex itself.
+
+Density function of a set of blobs is calculated by method
+\begin{verbatim}
+Blob::runBlob()
+\end{verbatim}
+that adds array of blobs to the grid according to \autoref{eq:metaballdensity}.
+For better performance, this method utilizes constant memory. Device is queried
+for size of constant memory via \texttt{cl::Device::getInfo()}. As
+mentioned in \autoref{chap:cl} constant memory is efficient for data that is
+simultaneously accessed by many threads. In case of \texttt{Blob} program,
+every thread iterates over all blobs. If size of blob data exceeds constant
+memory size, input is divided into packets that are within the limit, and kernel
+is simply invoked multiple times, until all blobs are processed.
+
+\subsubsection{Generating geometry}
+
+When density function of all blobs is calculated for a single grid, such grid
+is submitted to \texttt{MarchingCubes::compute()} method that runs OpenCL--powered
+Marching Cubes implementation (see \autoref{sec:mcgpu}). Once the geometry for
+all blocks is generated, it's passed to one of two exporter functions that write
+the results to disk in format selected by the user. Wavefront OBJ outpu can be
+read by virtually every 3D graphics software and AVR can be read by aforementioned
+Vorticity game engine.
+
+
