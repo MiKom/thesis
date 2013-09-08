@@ -1,8 +1,64 @@
 \chapter{Related work}
 \label{chap:related}
-\section{Ovierview of karstification modelling}
-\section{Single fracture simulation}
-\section{Two-dimensional simulations}
-\section{Three-dimensionsal simulations}
-\section{Stochastic approaches}
+
+This chapter presents basics of modelling of processes governing evolution of
+karst aquifers. This description will provide basis for the data formats
+used in programming project. Some visualisation techniques used previously for
+caved terrains will also be presented.
+
+\section{Modelling karst aquifers}
+
+As karst aquifers contain network of fractures (see \autoref{chap:karstification})
+a simulation of flow and chemical reactions in single fracture is the basic
+building block of presented models.
+
+These fractures are connected to form larger, two or three--dimensional networks,
+that represent whole conduits.
+
+First attempts to describe processes taking place during evolution of karst
+aquifers with numerical models took place in early 1980's \parencite[p. 3]{hiller2013}.
+\Cite{Buhmann1985189} developed numerical model for ternary chemical system
+(\cee{CaCO3}--\cee{CO2}--\cee{H2O}) in open systems (where \cee{CO2} is exchanged
+with atmosphere) and for closed ones \parencite{Buhmann1985109}.
+
+\subsection{Single fracture simulation}
+
+With these dissolution models in place several models of single conduit were
+presented \parencite[pp. 4]{hiller2013}.
+
+Single fracture is modelled as a circular conduit in the intersection
+of fissure and bedding plane \parencite{Kaufmann200962} or as a space between
+two parallel walls of rock separated by aperture width \parencite{dreybrodt2002}.
+
+\subsection{Two--dimensional simulations}
+
+Single conduit one--dimensional models were later expanded into second dimension
+by combining set of conduits into a connected network \parencite[pp. 4--5]{hiller2013}.
+In such networks, fractures are organized into uniform, regular structure.
+
+\subsection{Three--dimensional simulations}
+
+With more powerful computational resources researchers started research on
+three--dimensional models that could finally provide insight into evolution
+of real--life karst aquifers. Such models were proposed by
+\cites{annable2003}{WRCR:WRCR9525}{Kaufmann2010241}.
+
+Work by \cite{hiller2013} summarizes current state of three--dimensional models.
+His thesis contains overview of modelling techniques and approaches. Simulation
+of real--live karst aquifer near dam--site is presented that matches
+observations. This shows validity of proposed models.
+
 \section{Visualisation techniques}
+
+Rendering techniques that touched the issue of cave rendering never tried to
+provide both physical accuracy and visually appealing graphics.
+
+In \cite{gpugems3ch01} a method for rendering procedural terrains is described
+that in some circumstances can generate caves. Similar to this work, presented
+method uses Marching Cubes algorithm (see \autoref{chap:marchingcubes})
+implemented on GPU (albeit in shaders, and not with any GPGPU solution) and
+carefully crafted density functions based on noise sampling.
+
+\Cite{forstmann2005} proposed method of on--the--fly rendering of procedural
+terrains that may also contain caves. It uses hierarchy of nested clip--boxes
+for LOD\footnote{Level of detail} calculation to reduce workload of the GPU.
