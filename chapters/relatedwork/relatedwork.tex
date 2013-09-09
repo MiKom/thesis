@@ -1,10 +1,13 @@
 \chapter{Related work}
 \label{chap:related}
 
-This chapter presents basics of modelling of processes governing evolution of
-karst aquifers. This description will provide basis for the data formats
-used in programming project. Some visualisation techniques used previously for
-caved terrains will also be presented.
+This chapter presents references to research work in domain of modelling processes
+governing evolution of karst aquifers along with small summaries. This
+description will be helpful in explaining design decisions in programming project,
+especially in area of input data formats.
+
+Some visualisation techniques used previously for caved terrains in various
+contexts will also be presented.
 
 \section{Modelling karst aquifers}
 
@@ -38,7 +41,7 @@ In such networks, fractures are organized into uniform, regular structure.
 
 \subsection{Three--dimensional simulations}
 
-With more powerful computational resources researchers started research on
+With more powerful computational resources researchers started looking into
 three--dimensional models that could finally provide insight into evolution
 of real--life karst aquifers. Such models were proposed by
 \cites{annable2003}{WRCR:WRCR9525}{Kaufmann2010241}.
@@ -48,17 +51,59 @@ His thesis contains overview of modelling techniques and approaches. Simulation
 of real--live karst aquifer near dam--site is presented that matches
 observations. This shows validity of proposed models.
 
+These three--dimensional models also store data as a uniform grid of fractures.
+This fact heavily infulenced the design of data structures used throughout
+programming part of this thesis described in \autoref{chap:project}.
+
 \section{Visualisation techniques}
 
 Rendering techniques that touched the issue of cave rendering never tried to
 provide both physical accuracy and visually appealing graphics.
 
 In \cite{gpugems3ch01} a method for rendering procedural terrains is described
-that in some circumstances can generate caves. Similar to this work, presented
-method uses Marching Cubes algorithm (see \autoref{chap:marchingcubes})
-implemented on GPU (albeit in shaders, and not with any GPGPU solution) and
-carefully crafted density functions based on noise sampling.
+that in some circumstances can generate caved structures. Similar to programming
+project of this thesis, presented method uses Marching Cubes algorithm
+(see \autoref{chap:marchingcubes}) implemented on GPU\footnote{Albeit in shaders,
+not with any GPGPU solution}. Volume data is generated through carefully crafted
+density functions based on noise sampling and various scalar
+functions that are easily computable in shaders.
 
 \Cite{forstmann2005} proposed method of on--the--fly rendering of procedural
 terrains that may also contain caves. It uses hierarchy of nested clip--boxes
 for LOD\footnote{Level of detail} calculation to reduce workload of the GPU.
+
+\Cite{hiller2013} developed \emph{KARSTTOOL} -- a MATLAB application that
+is capable of plotting various parameters of three--dimensional fracture net
+computed by running karst evolution simulation with \emph{KARSTAQUIFER}
+simulator introduced in \cite{Kaufmann200962}. This program doesn't strive to provide visually rich renders; it's
+aimed at researchers that want to visualise various parameters of simulated
+karst aquifer like \cee{CO2} or \cee{HCO3} concentration. Screenshot of KARSTOOL
+application is presented below.
+
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width=\textwidth]{chapters/relatedwork/karsttool.png}
+  \end{center}
+  \caption{Screenshot of KARSTTOOL application. Results tab is shown that
+  presents visualisation of simulation.}
+  \label{fig:karsttool}
+\end{figure}
+
+\subsection{Surveying software}
+
+Research around cave rendering is also done for cave surveying software.
+These specialized programs allow speleologists to capture data about structure
+of caves by manual or device--assisted measurement during exploration and plot
+the gathered data. Examples of open--source programs of this kind are
+\emph{Therion}\footnote{\url{http://therion.speleo.sk/index.php}} and
+\emph{Survex}\footnote{\url{http://www.survex.com}}. More comprehensive list,
+albeit outdated, is available at British Cave Research Association Cave Surveying
+Special Group (\url{http://csg.bcra.org.uk/software.html}). Screenshot of 3D
+plot of graphic survey data from Therion is presented below.
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width=\textwidth]{chapters/relatedwork/therion.png}
+  \end{center}
+  \caption{3D visualisation of cave survey data from Therion application}
+  \label{fig:therion}
+\end{figure}
