@@ -31,10 +31,36 @@ implemented in computer software and represent simulated karst structure as
 net of fractures.
 
 These tools, being aimed at speleogenesis experts, present results of
-calculations with simple plots. Programming project of this thesis provides
+calculations with simple plots. Programming project of this thesis called \emph{karstgen} provides
 solution for richer presentation of geometric structure of modelled karst
 structure. It can take input data in format that is similar to formats used by
 simulation software for results and generate triangle mesh in two file formats,
-of which one is simple textual file format importable by most three--dimensional
-modelling software.
+of which one is simple and popular textual file format supported by most
+three--dimensional modelling software. Presentation in such program may be
+beneficial for better understanding of data or for later usage in e.g. video
+games.
+
+Since karst evolution models usually simulate large datasets karstgen uses
+GPU acceleration to speed--up mesh generation process.
+
+\pagebreak
 \section{Structure of the thesis}
+
+Below is overview of each chapter along with description how it contributes to
+the thesis.
+\begin{description}
+  \item[Chapter 2 -- Karst and karstification process] \hfill \\
+    This chapter introduces basic definitions related to karst landscape forms
+    used later in the work. Karstification process is presented with basic
+    overview of chemical reactions that drive it. Information contained in this
+    chapter provides rationale for the shape of karst evolution simulation
+    models presented in subsequent chapters.
+  \item[Chapter 3 -- Related work] \hfill \\
+    References to various works relevant to the subject are presented here.
+    Brief overview of karst evolution models is presented which explains some
+    of the design decisions taken in the programming project.
+
+    Several works related to rendering, rather than simulating, caved terrains
+    are also described.
+\end{description}
+
