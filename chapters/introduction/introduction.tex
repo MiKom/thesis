@@ -49,18 +49,35 @@ GPU acceleration to speed--up mesh generation process.
 Below is overview of each chapter along with description how it contributes to
 the thesis.
 \begin{description}
-  \item[Chapter 2 -- Karst and karstification process] \hfill \\
+  \item[\Cref{chap:karstification} -- Karst and karstification process] \hfill \\
     This chapter introduces basic definitions related to karst landscape forms
     used later in the work. Karstification process is presented with basic
     overview of chemical reactions that drive it. Information contained in this
     chapter provides rationale for the shape of karst evolution simulation
     models presented in subsequent chapters.
-  \item[Chapter 3 -- Related work] \hfill \\
+  \item[\Cref{chap:related} -- Related work] \hfill \\
     References to various works relevant to the subject are presented here.
     Brief overview of karst evolution models is presented which explains some
     of the design decisions taken in the programming project.
 
     Several works related to rendering, rather than simulating, caved terrains
     are also described.
+  \item[\Cref{chap:cl} -- OpenCL heterogeneous programming platform] \hfill \\
+    Here, OpenCL is described. It's a programming library, maintained by Khronos
+    Group Inc., that lets programmers leverage diverse computational resources
+    offered by modern computers in standardized manner. OpenCL is extensively
+    used by programming project of this thesis so this introduction gives
+    reader a background for understanding implementation details.
+  \item[\Cref{chap:marchingcubes} -- Isosurface extraction with Marching Cubes] \hfill \\
+    In this chapter Marching Cubes algorithm that is used in programming project
+    is described. This algorithm extracts polygonal meshes of isosurfaces from
+    three--dimensional scalar functions. GPU--accelerated variant used in
+    project is also described.
+  \item[\Cref{chap:project} -- Programming project description] \hfill \\
+    This chapter describes features and architecture of programming project, as
+    well as some more in--depth technical details of the implementation.
+  \item[\Cref{chap:furtherwork} -- Conclusions and further work] \hfill \\
+    \todo{fill in when chapter done}
+
 \end{description}
 
