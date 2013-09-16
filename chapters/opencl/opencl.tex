@@ -196,20 +196,13 @@ presented in \autoref{sec:climpl}.
 
 \section{Memory model}
 
-\begin{figure}[htpb]
-  \begin{center}
-    \includegraphics[width=\textwidth]{chapters/opencl/memory.png}
-  \end{center}
-  \caption{Abstract memory model of OpenCL \parencite{gaster2012heterogeneous}}
-  \label{fig:clmemmodel}
-\end{figure}\todo{replace \autoref{fig:clmemmodel} with TikZ graphic}
-
 OpenCL provides layer of abstraction on device memory. Depending on the
 capabilities of given device, some of memories described below may be
 unavailable.
 
 Below are descriptions of memories defined by OpenCL specification. They are
 divided to Host--side and Device--side memories.
+
 
 \subsection{Host--side memory model}
 
@@ -245,8 +238,14 @@ in this context:
     of this heritage, images are not supported by every OpenCL implementation.
 
 \end{description}
+\begin{figure}[ht]
+  \begin{center}
+    \input{chapters/opencl/memorymodel.tex}
+  \end{center}
+  \caption{Abstract memory model of OpenCL \parencite{gaster2012heterogeneous}}
+  \label{fig:clmemmodel}
+\end{figure}
 \todo{If time allows, write about pinned memory}
-
 \subsection{Device-side memory model}
 
 These are OpenCL memory types, as seen from kernel perspective.
