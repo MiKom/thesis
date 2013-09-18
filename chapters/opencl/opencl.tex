@@ -136,15 +136,6 @@ memories.
 
 Diagram of this logical structure is presented in \autoref{fig:clhw}.
 
-\begin{figure}[h]
-	\begin{center}
-		%\includegraphics[scale=0.7]{chapters/opencl/opencl_hwmodel.jpg
-	  \input{chapters/opencl/hwmodel.tex}
-	\end{center}
-	\caption{Logical partitioning of hardware in OpenCL}
-	\label{fig:clhw}
-\end{figure}
-
 \subsection{Platforms}
 
 On the top of the hierarchy there is a \emph{Platform}. It is usually an implementation
@@ -168,6 +159,15 @@ is available that will present to the user platforms from all vendors available
 on the system. This extension also makes sure, that function calls with OpenCL
 object created in certain platform will be routed to implementations in this
 platform.
+
+\begin{figure}[hb]
+	\begin{center}
+		%\includegraphics[scale=0.7]{chapters/opencl/opencl_hwmodel.jpg
+	  \input{chapters/opencl/hwmodel.tex}
+	\end{center}
+	\caption{Logical partitioning of hardware in OpenCL}
+	\label{fig:clhw}
+\end{figure}
 
 \subsection{Devices}
 
