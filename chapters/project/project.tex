@@ -51,15 +51,17 @@ generate geometry from a list of metaballs in 3D space.
 
 \section{Implementation}
 \subsection{Metaballs}
-\todo{Change equatios to the ones used in project}
 Implementation heavily relies on rendering with metaballs. Metaball in 3D space
 is a scalar function in the form:
 \begin{equation}
-  f(x,y,z)=\frac{d}{(x-x_0)^2+(y-y_0)^2+(z-z_0)^2}
+  f(x,y,z)=Te^{\frac{B}{R^2}r^2 - B}
   \label{eq:metaball}
 \end{equation}
-where $(x_0,y_0,z_0)$ is the center of the metaball and $d$ is a multiplier that
-controls the size of the metaball.
+where $r$ is distance from point $(x,y,z)$ to the center of the metaball, $B$ is
+,,blobiness'' factor that controls tendency to ,,melt'' with other metaballs, $T$
+is isovalue that will be used for rendering and $R$ is the radius of the
+metaball if it was isolated from other blobs. This equation is basically a
+Gaussian bump centerd at the center of the metaball.
 
 If more than one metaball is present in the scene, density function (see Definition
 \autoref{def:density function})
@@ -72,8 +74,13 @@ where $n$ is the total number of metaballs in the scene and $f_i$ is function~\r
 of the $i$-th metaball.
 
 Metaballs were discovered by Jim Blinn when he was working on visualisation of
-molecular structures \parencite{Blinn:1982:GAS:357306.357310}.
-\todo{add input file to thesis}
+molecular structures \parencite{Blinn:1982:GAS:357306.357310}. Density function 
+was derieved from equation defining density of electron field of hydrogen atom
+as used in quantum mechanics.
+
+This ,,melting'' property visible when metaballs are close to each other gives
+somewhat ,,organic'' look and feel of structures generated with them
+(see \autoref{fig:metaballs}).
 \label{sub:metaballs}
 \begin{figure}[htb]
   \begin{center}
@@ -88,8 +95,6 @@ molecular structures \parencite{Blinn:1982:GAS:357306.357310}.
   \label{fig:metaballs}
 \end{figure}
 
-They have the interesting property of ,,melting'' when getting close together
-forming structure with somewhat ,,organic'' look and feel (see \autoref{fig:metaballs}).
 
 \subsection{Overview}
 Both blobber and mcblob are implemented in C++ language with latest C++11
