@@ -1,2 +1,55 @@
 \chapter{Conclusions and further work}
 \label{chap:furtherwork}
+
+Programming project accompanying this thesis, called \emph{karstgen}, provides
+usable way to represent karst simulation data as a three--dimensional polygon
+mesh. It consumes data that is similar in structure to formats used as output of
+these simulations. Since karstgen is able to produce models in popular OBJ file
+format, its results can be imported by most of 3D modelling software for further
+modifications and examinations.
+
+Method of geometry generation through placing of blobs along aquifer structures
+and rendering them with Marching cubes proved to yield positive visual results.
+Possibility of adding randomness to generated meshes helps in achieving
+visually pleasing (\autoref{fig:interior}) meshes that could be used in e.g.
+video games. Given simplicity of karstgen input file format it would be easy to
+write application aimed at artist that could be used for creating caved terrains.
+
+To increase performance, karstgen uses OpenCL (see \autoref{chap:cl}) to
+accelerate computations on GPU. With multi--vendor support for this standard,
+it highly probable, that OpenCL will be supported in the future.
+
+\section{Possible development of karstgen}
+
+Right now, karstgen produces only the primary geometry of fracture network based
+on diameters. To create more realistically--looking output, microstructure of
+the cave wall would have to be introduced by e.g. bump mapping.
+
+No material data of cave walls is generated. Karstgen produces only the mesh which
+can be later textured in external program. Additional data, like amount of water
+flowing through fracture or calcium concentration, that could be passed to blobber
+and later to mcblob by simulation software could be helpful in procedural
+material generation.
+
+Because Marching Cubes algorithm is executed independently for every voxel in the
+domain, almost all vertices are created twice. Adjacent voxel don't know about
+each other, and don't share vertices. Mesh created this way is larger than
+needed. Additional step that removes doubled vertices could be
+introduced\footnote{Such functionality is available in e.g. Blender}.
+
+Even though computation is accelerated with GPU, rendering of large dataset could
+be very time consuming. As described in \autoref{sub:mcblob} each block is
+computed independently. In current implementation, data for one block
+is roughly 10MB in size. It's constrained mainly by abilities of GPU implementation
+of prefix sum algorithm that limits size of single block to $64\times 64\times 64$
+voxels. With modern GPUs having at least 1GB of video ram, many more blocks
+could be uploaded to GPU and their synchronization could by coordinated by
+OpenCL event mechanism. This could reduce context--switching significantly.
+Also, density function calculation could be greatly shortened. Typically,
+metaballs that are far from currently calculated location have little or no
+impact on the density function. That is why domain could be partitioned into chunks
+in which only relevant metaballs are taken into account. To further improve
+performance some other, possibly less computationally expensive function with
+similar characteristics could be used for single metaball than one showed in
+\autoref{eq:metaballdensity}.
+
