@@ -474,9 +474,12 @@ runtime for CPUs is based on \cite{gummaraju2010twin}.
 
 \begin{figure}[htb]
   \begin{center}
-    \includegraphics[width=\textwidth]{chapters/opencl/bulldozer.png}
+    %\includegraphics[width=\textwidth]{chapters/opencl/bulldozer.png}
+    \scalebox{0.9} {
+      \input{chapters/opencl/bulldozer_arch.tex}
+    }
   \end{center}
-  \caption{Block diagram of hardware architecture of AMD FX--8150 CPU. Devices
+  \caption{Block diagram of hardware architecture of AMD FX--8150 CPU. Device
     has 8 cores packed into 2--core logical modules sharing FPU unit, 2MiB of
     L2 data cache, instruction fetching/decoding units and branch predictor.}
   \label{fig:bulldozerarch}
