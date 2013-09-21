@@ -497,11 +497,10 @@ OpenCL compute unit. Since CPU doesn't have any controllable cache, RAM is used
 for all kinds of OpenCL memories. However, special measures are taken, to ensure
 that private memory of work--items and local memory of work--groups is
 laid in a way that is optimal for cache locality.
-\todo{Replace \autoref{fig:clbullexec} with proper graphics}
 \subsubsection{Execution model}
 \begin{figure}[htb]
   \begin{center}
-    \includegraphics[width=\textwidth]{chapters/opencl/bulldozerexec.png}
+    \input{chapters/opencl/bulldozerexec.tex}
   \end{center}
   \caption{Execution model of OpenCL on AMD FX--8150 CPU.}
   \label{fig:clbullexec}
@@ -619,8 +618,8 @@ Another problem is usage of registers. Since execution isn't stack--based like
 in x86 CPUs, every local variable must go to Register File on SM that is rather
 small. When too many registers are used, either less blocks will be able to
 be computed at the same time, or register spilling mechanism that uses orders
-of magnitude slower global memory as a backup location for overflowing variables.
-Both of these possibilities may significantly reduce performance.
+of magnitude slower global memory as a backup location for overflowing variables
+will kick in. Both of these possibilities may significantly reduce performance.
 
 As mentioned before, execution of threads on GPU isn't stack based. All function
 calls in kernels are inlined. Therefore, algorithms that rely on recursion with
