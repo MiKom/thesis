@@ -270,7 +270,7 @@ int getCubeIndex(float4 *cubeValues, float isoValue)
 
 \begin{figure}[hb]
 	\begin{center}
-		\includegraphics[width=\textwidth]{chapters/marchingcubes/compact.jpg}
+		\input{chapters/marchingcubes/compact.tex}
 	\end{center}
 	\caption{Example of compaction procedure. Index of each non empty voxel
 		is saved in \texttt{compactedVoxelArray}. Place to which index
@@ -278,7 +278,6 @@ int getCubeIndex(float4 *cubeValues, float isoValue)
 	}
 	\label{fig:mccompact}
 \end{figure}
-\todo{replace figures \ref{fig:mccompact} and \ref{fig:mcvertscan} with proper graphics}
 
 To overcome problem highlighted in \autoref{sec:mcgpu} a special compacting
 operation is performed on arrays from previous step. First, a prefix-sum array
@@ -327,12 +326,13 @@ void compactVoxels(
 \end{lstlisting}
 
 Scan operation on \texttt{voxelVerts} array gives \texttt{generateTriangles}
-kernel offset to the result array where data for given voxel should be written.
+kernel an offset to the result array where data for given voxel should be written.
 For an example refer to \autoref{fig:mcvertscan}.
 
-\begin{figure}[b]
+\begin{figure}[htb]
 	\begin{center}
-		\includegraphics[width=\textwidth]{chapters/marchingcubes/vertscan.jpg}
+		%\includegraphics[width=\textwidth]{chapters/marchingcubes/vertscan.jpg}
+		\input{chapters/marchingcubes/vertscan.tex}
 	\end{center}
 	\caption{Scan operation on \texttt{voxelVerts} array gives indexes to
 		final result array for every active voxel.

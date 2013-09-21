@@ -1,0 +1,20 @@
+\begin{tikzpicture}[ >=stealth,
+provided/.style={rectangle,draw=black!50,fill=black!10},
+optional/.style={dashed,rectangle,draw=black!50,fill=black!10}
+]
+
+\node (data) {Fracture data};
+\node (dummy1) [below=of data] {} ;
+\node[optional] (converter) [right=of dummy1] {converter};
+\node[provided] (blobber) [right=of converter] {blobber};
+\node[provided] (mcblob) [right=of blobber] {mcblob};
+\node (dummy) [right=of mcblob] {};
+\node (obj) [above=of dummy] {OBJ file};
+\node (avr) [below=of dummy] {AVR file};
+
+\draw[->] (data) to [bend right] (converter);
+\draw[->] (converter) to (blobber);
+\draw[->] (blobber) to (mcblob);
+\draw[->] (mcblob) to [bend left](obj);
+\draw[->] (mcblob) to [bend right](avr);
+\end{tikzpicture}
