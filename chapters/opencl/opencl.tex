@@ -474,7 +474,6 @@ runtime for CPUs is based on \cite{gummaraju2010twin}.
 
 \begin{figure}[htb]
   \begin{center}
-    %\includegraphics[width=\textwidth]{chapters/opencl/bulldozer.png}
     \scalebox{0.9} {
       \input{chapters/opencl/bulldozer_arch.tex}
     }
@@ -484,7 +483,6 @@ runtime for CPUs is based on \cite{gummaraju2010twin}.
     L2 data cache, instruction fetching/decoding units and branch predictor.}
   \label{fig:bulldozerarch}
 \end{figure}
-\todo{Replace \autoref{fig:bulldozerarch} with proper graphics.}
 
 Entire processor is presented to the programmer as a single OpenCL
 device\footnote{However with \emph{device fission} mechanism introduced in OpenCL 1.2 (and
@@ -567,12 +565,11 @@ Each SM contains the following elements (for graphical diagram see
 \end{description}
 \begin{figure}[htb]
   \begin{center}
-    \includegraphics[width=0.7\textwidth]{chapters/opencl/fermism.png}
+    \input{chapters/opencl/fermism.tex}
   \end{center}
   \caption{Hihg--level overview of elements forming Fermi SM}
   \label{fig:fermism}
 \end{figure}
-\todo{replace \autoref{fig:fermism} with TikZ graphics}
 
 These 16 SMs are accompanied by following units in the chip
 \begin{itemize}
