@@ -13,8 +13,7 @@ and examination.
 Karstgen can also create models for \emph{Vorticity} game engine that was created
 by the author together with mr Michał Siejak for graphics related courses\footnote{Computer
   Graphics and Visualiation, summer semester 2009/2009 and Group Project, summer
-semester 2009/2010} during licenciate studies at Adam Mickiewicz University \todo{check form}in
-Poznań.
+semester 2009/2010} during licenciate studies at Adam Mickiewicz University of~Poznań.
 
 \section{Architecture}
 
@@ -136,14 +135,15 @@ one diameter in a vector it is assumed that the fraction it represens has the
 same diameter along its whole length. When no diameters are present in some
 vector, it is assumed that there is no fracture in this direction.
 Additional field \texttt{midDiam} is a diameter of blob that should be placed in
-the intersection of the three fractures.
+the intersection of the three fractures (see \autoref{fig:datapoint}).
 
-\begin{figure}[hb]
+\begin{figure}[hbp]
   \begin{center}
     \input{chapters/project/datapoint.tex}
   \end{center}
   \caption{Graphical representation of \texttt{DataPoint} -- a basic structure that
-blobber works on}
+blobber works on. In this example, there are 4 diameters in x direction,
+2 in z direction and 8 in y direction.}
   \label{fig:datapoint}
 \end{figure}
 
@@ -181,7 +181,7 @@ point at the end of the axis, \texttt{nextDpMidDiam} is considered to be 0.\todo
 
 \begin{figure}[htb]
   \begin{center}
-    \includegraphics[width=\textwidth]{chapters/project/placement.jpg}
+    \input{chapters/project/placement.tex}
   \end{center}
   \caption{Blobs are placed along fracture defined as set of diameters
     $(d_0,d_1,\cdots,d_{n-1})$. In this example diameter of blob $b_1$ will be a

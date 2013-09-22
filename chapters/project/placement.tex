@@ -1,0 +1,13 @@
+\begin{tikzpicture}[]
+
+\draw (0,0) node [font=\footnotesize,anchor=south] {\texttt{midPointDiam}}
+  [fill] circle (0.05) -- ++(2,0)
+  circle (0.05) node[font=\footnotesize, anchor=south] {$d_0$}
+  -- ++(2.0,0) [fill] circle (0.05) node[font=\footnotesize,anchor=south]{$d_1$};
+\draw[dashed] (4,0) -- ++(1.5,0);
+\draw[fill] (5.5,0) circle (0.05) node[font=\footnotesize,anchor=south] {$d_{n-1}$}
+ -- ++(2,0) node[font=\footnotesize,anchor=south] {$d_{n}$} circle (0.05)
+ -- ++(2,0) node[font=\footnotesize,anchor=south] {\texttt{nextDpMidDiam}} circle (0.05);
+\draw[dashed]  (3.5,0) circle (1.0);
+\draw (3.5,0) [fill=white] circle (0.05) node [font=\footnotesize,anchor=north]{$b_1$};
+\end{tikzpicture}
