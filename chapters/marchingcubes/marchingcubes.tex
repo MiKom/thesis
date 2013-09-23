@@ -2,7 +2,7 @@
 \label{chap:marchingcubes}
 
 This chapter will present a method of isosurface extraction that is later used
-in the programming project. First, basic definitions will be established and
+in programming project. First, basic definitions will be established and
 rationale for generating graphics with volumetric data will be discussed.
 Next, brief history and high level overview of Marching Cubes will be presented.
 Technical details will follow with description of implementation on highly
@@ -26,15 +26,15 @@ rendering isosurfaces \parencite{gpugems3ch01}.
 
 \begin{defn} \emph{Isosurface} is a
 surface in three-dimensional space that consists of points that have the same
-value of \emph{density function}.
+value of \emph{density function} called threshold value.
 Points
-in domain which density function value is below this value are considered to
-lie below the surface and points which density function value is above this
-value are considered to lie above the surface. Points which density function
-value is equal to the isovalue are considered to lie exactly on the isosurface.
+in domain with density function value smaller than threshold value are considered to
+lie below the surface and points which density function value larger than threshold
+value are considered to lie above the surface. Points with density function
+value equal to the threshold are considered to lie exactly on the isosurface.
 \end{defn}
 
-\begin{defn} \emph{Isovalue} is a value of density function that forms the
+\begin{defn} \emph{Isovalue} is a threshold value of density function that forms the
   \emph{isosurface}.
 \end{defn}
 
@@ -117,6 +117,9 @@ combinations of vertices into 15 cases. These cases are presented in
 \autoref{fig:mccases}. Remaining combinations are derived from these cases
 through applying symmetries, rotations, and switching all signs of cube verices.
 
+Another LUT is consulted that maps cube index to edge numbers on which generated
+vertices will lie. Vertex is then emitted for each edge that is crossed by the isosurface.
+
 Process is repeated for all cubes in the lattice and emitted polygons (possibly
 with normal vectors for lighting) are the output of the algorithm.
 
@@ -140,7 +143,7 @@ with normal vectors for lighting) are the output of the algorithm.
 Operation on a single cube begins with evaluating density function on each
 vertex of the cube.
 
-Index of the cube is calculated through operation described below
+Index of the cube is calculated through operation described under 
 \autoref{fig:mcnumbering}.
 
 \begin{figure}[hb]
@@ -149,7 +152,7 @@ Index of the cube is calculated through operation described below
   }
   \caption{
     Numbering of vertices and edges in Marching Cubes. Cube index is
-    derived by concatenation of bits \texttt{index = v8|v7|v6|v5|v4|v3|v2|v1}
+    derived by concatenation of bits: \texttt{index = v8|v7|v6|v5|v4|v3|v2|v1}
     where each \texttt{v}\emph{i} is logical result (0 or 1) of operation of comparing
     density function value at \emph{i}-th vertex with threshold value
     (\texttt{value(i) > threshold}).
@@ -249,7 +252,10 @@ void classifyVoxel(
 }
 \end{lstlisting}
 Note that additional lookup table (\texttt{numVertsTex}) that maps cube index to
-number of vertices it produces is used. This LUT is accessed as a texture.
+number of vertices it produces is used. This LUT is accessed as a texture.\footnote{All other
+  LUTs are accessed this way as well. This partially mitigates one problem
+  described in \autoref{sec:mcgpu}
+}
 
 Index of the cube is calculated as described in \autoref{fig:mcnumbering}:
 
@@ -305,7 +311,7 @@ Cubes is working is rather sparse, this approach can bring enormous performance
 gains.
 
 Let call the number of active voxels $n$. Compaction kernel creates an array
-of length $n$ that will contain indexes of non empty voxels. For illustration of
+of length $n$ that will contain indices of non empty voxels. For illustration of
 this process refer to \autoref{fig:mccompact}.
 
 Below is the code that performs the compaction.
@@ -334,7 +340,7 @@ For an example refer to \autoref{fig:mcvertscan}.
 		%\includegraphics[width=\textwidth]{chapters/marchingcubes/vertscan.jpg}
 		\input{chapters/marchingcubes/vertscan.tex}
 	\end{center}
-	\caption{Scan operation on \texttt{voxelVerts} array gives indexes to
+	\caption{Scan operation on \texttt{voxelVerts} array gives indices to
 		final result array for every active voxel.
 	}
 	\label{fig:mcvertscan}
@@ -344,8 +350,8 @@ For an example refer to \autoref{fig:mcvertscan}.
 
 Triangle generation is handled by \texttt{generateTriangles} kernel. It figures
 out the number of voxel it's working on from \texttt{compactedVoxelArray}. Next,
-array in local memory is allocated for computing locations of vertices on each
-of the 12 edges on the cube.
+array in local memory is allocated for computing locations of vertices and normal
+vectors on each of the 12 edges on the cube.
 
 \begin{lstlisting}
 __local float4 vertList[12*NTHREADS];
