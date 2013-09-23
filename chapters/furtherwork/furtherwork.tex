@@ -5,15 +5,16 @@ Programming project accompanying this thesis, called \emph{karstgen}, provides
 usable way to represent karst simulation data as a three--dimensional polygon
 mesh. It consumes data that is similar in structure to formats used as output of
 these simulations. Since karstgen is able to produce models in popular OBJ file
-format, its results can be imported by most of 3D modelling software for further
+format, its results can be imported by most 3D modelling software suites for further
 modifications and examinations.
 
-Method of geometry generation through placing of blobs along aquifer structures
+Method of geometry generation through placing of blobs along an aquifer fractures
 and rendering them with Marching cubes proved to yield positive visual results.
 Possibility of adding randomness to generated meshes helps in achieving
 visually pleasing (\autoref{fig:interior}) meshes that could be used in e.g.
 video games. Given simplicity of karstgen input file format it would be easy to
-write application aimed at artist that could be used for creating caved terrains.
+write application aimed at artist that could be used for creating caved terrains
+by providing input data to karstgen.
 
 To increase performance, karstgen uses OpenCL (see \autoref{chap:cl}) to
 accelerate computations on GPU. With multi--vendor support for this standard,
@@ -32,10 +33,11 @@ and later to mcblob by simulation software could be helpful in procedural
 material generation.
 
 Because Marching Cubes algorithm is executed independently for every voxel in the
-domain, almost all vertices are created twice. Adjacent voxel don't know about
+domain, almost all\footnote{except the ones on the boundary of the domain}
+vertices are created twice. Adjacent voxel don't know about
 each other, and don't share vertices. Mesh created this way is larger than
 needed. Additional step that removes doubled vertices could be
-introduced\footnote{Such functionality is available in e.g. Blender}.
+introduced\footnote{such functionality is available in e.g. Blender}.
 
 Even though computation is accelerated with GPU, rendering of large dataset could
 be very time consuming. As described in \autoref{sub:mcblob} each block is
