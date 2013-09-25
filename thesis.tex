@@ -71,7 +71,9 @@
 
 %\maketitle
 
-\thispagestyle{empty}
+\begin{titlingpage}
+\calccentering{\unitlength}
+\begin{adjustwidth*}{\unitlength}{-\unitlength}
 \begin{center}
  \begin{LARGE}
    Adam Mickiewicz University of~Poznań\\
@@ -86,7 +88,11 @@
      \leftskip=-3cm plus 1fil\rightskip=-3cm plus 1fil
      Modelling System of~Karst Caves\\ for Computer Graphics\\
    \end{Huge}
-   \vspace{2.5cm}
+   \vspace{0.3cm}
+   \begin{footnotesize}
+     (Modelowanie systemu jaskiń krasowych dla grafiki komputerowej)
+   \end{footnotesize}
+   \vspace{2.3cm}
     \begin{flushleft}
       \leftskip=0.5\hsize
       \large
@@ -98,10 +104,10 @@
     Poznań, 2013
  \end{LARGE}
 \end{center}
-\newpage
+\end{adjustwidth*}
+\end{titlingpage}
 
 \listoftodos
-\newpage\null\thispagestyle{empty}\newpage
 
 \begin{center}
   \LARGE{Oświadczenie}
