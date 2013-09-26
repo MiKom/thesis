@@ -19,7 +19,7 @@ semester 2009/2010} during licenciate studies at Adam Mickiewicz University of~P
 
 Karstgen was created with Unix Philosophy in mind \parencite{raymond2003art}.
 It is made of two programs named \emph{blobber} and \emph{mcblob} that have
-clearly defined reposinsibilities and communicate through simple textual data
+clearly defined responsibilities and communicate through simple textual data
 format.  Both programs may take input either from files or from standard input
 so they can be piped together with shell pipes. Data flow of karstgen is
 presented in \autoref{fig:karstgenflow}.
@@ -56,7 +56,7 @@ is a scalar function in the form \parencite[p. 4]{Blinn:1982:GAS:357306.357310}:
   f(x,y,z)=Te^{\frac{B}{R^2}r^2 - B}
   \label{eq:metaball}
 \end{equation}
-where $r$ is distance from point $(x,y,z)$ to the center of the metaball, $B$ is
+where $r$ is distance from point $(x,y,z)$ to the centre of the metaball, $B$ is
 ,,blobiness'' factor that controls tendency to ,,melt'' with other metaballs, $T$
 is isovalue that will be used for rendering and $R$ is the radius of the
 metaball if it was isolated from other blobs. This equation is basically a
@@ -74,7 +74,7 @@ of the $i$-th metaball.
 
 Metaballs were discovered by Jim Blinn during his work on visualisation of
 molecular structures \parencite{Blinn:1982:GAS:357306.357310}. Density function 
-was derieved from equation defining density of electron field of hydrogen atom
+was derived from equation defining density of electron field of hydrogen atom
 as used in quantum mechanics.
 
 This ,,melting'' property visible when metaballs are close to each other gives
@@ -85,7 +85,7 @@ somewhat ,,organic'' look and feel of structures generated with them
   \begin{center}
     \includegraphics[width=\textwidth]{chapters/project/metaballs.png}
   \end{center}
-  \caption{Two metaballs at various distances showing how they are ,,melitng''
+  \caption{Two metaballs at various distances showing how they are ,,melting''
     together when getting closer to each other. Geometry was generated with
     \emph{mcblob} program and final image was rendered with Blender 2.68 with
     Cycles renderer. Input file for mcblob that generates this model is
@@ -99,7 +99,7 @@ somewhat ,,organic'' look and feel of structures generated with them
 Both blobber and mcblob are implemented in C++ language with latest C++11
 version of the standard. Build system used to compile the code is \emph{CMake}\footnote{Cross--platform make}
 -- meta build system that can generate native projects for various IDEs\footnote{Integrated Development Environment}
-andactual build systems. Executables use \emph{Boost Program Options} library
+and actual build systems. Executables use \emph{Boost Program Options} library
 for parsing command line arguments and providing help.
 
 Karstgen uses unit testing framework \emph{Google~Test}\footnote{\url{http://code.google.com/p/googletest/}}.
@@ -132,7 +132,7 @@ struct DataPoint
 This structure can describe three fractures originating in index $(x,y,z)$ in
 the fracture net and going along each axe in ascending direction. Each fracture
 is described as a vector of uniformly distributed diameters. If there is only
-one diameter in a vector it is assumed that the fraction it represens has the
+one diameter in a vector it is assumed that the fraction it represents has the
 same diameter along its whole length. When no diameters are present in some
 vector, it is assumed that there is no fracture in this direction.
 Additional field \texttt{midDiam} is a diameter of blob that should be placed in
@@ -243,7 +243,7 @@ of \texttt{float4} values that is $(v_x+1)\times(v_y+1)\times(v_z+1)$ elements l
 Four floats are kept for each vertex instead of one to facilitate computation of
 normal vectors. In case of \texttt{Grid} components $x$, $y$ and
 $z$ store density function values in positions shifted by small value along
-respective axes~--~a gradient of desity function in position of the vertes.
+respective axes~--~a gradient of density function in position of the vertes.
 Finally, $w$ component stores value at the vertex itself.
 
 Density function of a set of blobs is calculated by method:

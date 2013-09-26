@@ -172,7 +172,7 @@ platform.
 
 \subsection{Devices}
 
-Platform, may contain one or more \emph{devices}. Devices are units that
+Platform may contain one or more \emph{devices}. Devices are units that
 actually execute the kernel code. Device may map for example to single GPU or
 CPU.
 
@@ -189,7 +189,7 @@ elements}. Devices can be queried for number of compute units they contain
 through \texttt{clGetDeviceInfo()} function.
 
 
-Exact details of mapping is dependant on OpenCL vendor. Underlying architectures
+Exact details of mapping are dependant on OpenCL vendor. Underlying architectures
 of GPUs, CPUs and DSPs\footnote{Digital Singal Processors} can differ greatly
 even within the same class of devices.
 
@@ -220,7 +220,7 @@ in this context:
     Buffers are similar in nature to flat C arrays. They have linear addressing,
     so pointer arithmetic is possible in kernel code.
 
-    Buffers differ however in one one crucial point with host memory. Operations
+    Buffers differ however in one crucial point with host memory. Operations
     on them are asynchronous. Functions like \texttt{clEnqueue\-Read\-Buffer()} that
     transfer data between host and device return immediately, and the transfer
     starts in the background. Event mechanism may be used for synchronization
@@ -256,7 +256,7 @@ These are OpenCL memory types, as seen from kernel perspective.
   \item[Global memory] \hfill \\
     Kernel-wide memory that is visible to all compute units on the device.
     It is the only memory that can be used for transferring data between host and
-    devices. This is also usually slowest type of memory on the device by raw
+    devices. This is also usually the slowest type of memory on the device by raw
     throughput.
     \pagebreak
   \item[Constant memory] \hfill \\
@@ -293,7 +293,7 @@ These are OpenCL memory types, as seen from kernel perspective.
 \section{Execution model}
 \label{sec:clexecmodel}
 
-This section will describe OpenCL objects that mange execution of programs on the
+This section will describe OpenCL objects that manage execution of programs on the
 device and stages of such execution.
 
 \subsection{Context}
@@ -309,7 +309,7 @@ that creates context from all devices of given type from one platform \parencite
 \subsection{Programs and Kernels}
 
 To execute kernel code on the device, it must be first provided to specialized
-compiler that tranlates human--readable source code to machine--specific
+compiler that translates human--readable source code to machine--specific
 instructions.
 
 Kernel code must be fed to \texttt{clCreate\-Program\-WithSource()} function in the form of
@@ -452,7 +452,7 @@ for next frame. For such use cases, two extensions were developed:
   \item \texttt{CL\_KHR\_gl\_sharing} for sharing memory objects with OpenGL
   \item \texttt{cl\_khr\_d3d10\_sharing} for sharing memory objects with Microsoft DirectX
 \end{itemize}
-With these extensions, round--trips between host an device memory are
+With these extensions, round--trips between host and device memory are
 unnecessary. Above steps are thus a bit different, because data is not read back
 but is used as an input for rendering by graphics API.
 
@@ -460,7 +460,7 @@ but is used as an input for rendering by graphics API.
 \label{sec:climpl}
 In this section, implementations of OpenCL on two different types of devices
 will be presented. One is an AMD Bulldozer CPU -- an 8--core general purpose x86
-processor and the other one isthe other one is  NVIDIA GTX580 -- a high--end consumer GPU. High--level hardware
+processor and the other one is NVIDIA GTX580 -- a high--end consumer GPU. High--level hardware
 architecture of both devices will be shown with mapping to OpenCL logical
 device hierarchy (see \autoref{sec:cllogicalabstraction}). Some specific
 considerations that must be taken when designing OpenCL application for these

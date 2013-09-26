@@ -18,7 +18,7 @@ by providing input data to karstgen.
 
 To increase performance, karstgen uses OpenCL (see \autoref{chap:cl}) to
 accelerate computations on GPU. With multi--vendor support for this standard,
-it highly probable, that OpenCL will be supported in the future.
+it is highly probable, that OpenCL will be supported in the future.
 
 \section{Possible development of karstgen}
 
@@ -40,7 +40,7 @@ needed. Additional step that removes doubled vertices could be
 introduced\footnote{such functionality is available in e.g. Blender}.
 
 Even though computation is accelerated with GPU, rendering of large dataset could
-be very time consuming. As described in \autoref{sub:mcblob} each block is
+be very time--consuming. As described in \autoref{sub:mcblob} each block is
 computed independently. In current implementation, data for one block
 is roughly 10MB in size. It's constrained mainly by abilities of GPU implementation
 of prefix sum algorithm that limits size of single block to $64\times 64\times 64$
