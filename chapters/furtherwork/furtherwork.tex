@@ -33,11 +33,11 @@ and later to mcblob by simulation software could be helpful in procedural
 material generation.
 
 Because Marching Cubes algorithm is executed independently for every voxel in the
-domain, almost all\footnote{except the ones on the boundary of the domain}
+domain, almost all\footnote{Except the ones on the boundary of the domain}
 vertices are created twice. Adjacent voxel don't know about
 each other, and don't share vertices. Mesh created this way is larger than
 needed. Additional step that removes doubled vertices could be
-introduced\footnote{such functionality is available in e.g. Blender}.
+introduced\footnote{Such functionality is available in e.g. Blender}.
 
 Even though computation is accelerated with GPU, rendering of large dataset could
 be very time--consuming. As described in \autoref{sub:mcblob} each block is
